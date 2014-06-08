@@ -3,10 +3,10 @@ REM   that uses boostdep.exe to generate a
 REM   complete Boost dependency report.
 REM It needs to be run from the Boost root.
 
-git pull
-git submodule update --init
+REM git pull
+REM git submodule update --init
 
-SET BOOSTDEP=bin.v2\tools\boostdep\src\msvc-8.0\debug\link-static\threading-multi\boostdep.exe
+SET BOOSTDEP=bin.v2\tools\boostdep\src\msvc-8.0\release\link-static\threading-multi\boostdep.exe
 
 FOR /f %%i IN ('git rev-parse HEAD') DO @SET REV=%%i
 
