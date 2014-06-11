@@ -749,7 +749,7 @@ struct module_level_actions
     virtual void module_start( std::string const & module ) = 0;
     virtual void module_end( std::string const & module ) = 0;
 
-    virtual void module2( std::string const & module ) = 0;
+    virtual void module2( std::string const & module, int level ) = 0;
 };
 
 static void output_module_level_report( module_level_actions & actions )
@@ -918,7 +918,19 @@ static void output_module_level_report( module_level_actions & actions )
 
             for( std::set< std::string >::iterator k = mdeps.begin(); k != mdeps.end(); ++k )
             {
-                actions.module2( *k );
+                int level = level_map[ *k ];
+
+                if( level >= unknown_level )
+                {
+                    int min_level = min_level_map[ *k ];
+
+                    if( min_level != 0 )
+                    {
+                        level = min_level;
+                    }
+                }
+
+                actions.module2( *k, level );
             }
 
             actions.module_end( *j );
@@ -971,9 +983,20 @@ struct module_level_txt_actions: public module_level_actions
         std::cout << "\n";
     }
 
-    void module2( std::string const & module )
+    void module2( std::string const & module, int level )
     {
-        std::cout << " " << module;
+        std::cout << " " << module << "(";
+
+        if( level >= unknown_level )
+        {
+            std::cout << "-";
+        }
+        else
+        {
+            std::cout << level;
+        }
+
+        std::cout << ")";
     }
 };
 
@@ -1024,9 +1047,14 @@ struct module_level_html_actions: public module_level_actions
         std::cout << "</small></li>\n";
     }
 
-    void module2( std::string const & module )
+    void module2( std::string const & module, int level )
     {
         std::cout << " " << module;
+
+        if( level < unknown_level )
+        {
+            std::cout << "<sup>" << level << "</sup>";
+        }
     }
 };
 
