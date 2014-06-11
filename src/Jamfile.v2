@@ -7,6 +7,11 @@
 project boostdep ;
 
 exe boostdep :
+    # sources
     boostdep.cpp
-    /boost//filesystem
+    /boost//filesystem :
+    # requirements
+    :
+    # default build
+    <variant>release
     ;
