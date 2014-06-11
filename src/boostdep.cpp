@@ -29,7 +29,9 @@ static void scan_module_headers( fs::path const & path )
 {
     try
     {
-        std::string module = path.generic_string().substr( 5 ); // "libs/"
+        std::string module = path.generic_string().substr( 5 ); // strip "libs/"
+
+        std::replace( module.begin(), module.end(), '/', '~' );
 
         s_modules.insert( module );
 
@@ -165,6 +167,12 @@ struct module_primary_actions
     virtual void from_header( std::string const & header ) = 0;
 };
 
+static fs::path module_include_path( std::string module )
+{
+    std::replace( module.begin(), module.end(), '~', '/' );
+    return fs::path( "libs" ) / module / "include";
+}
+
 static void scan_module_dependencies( std::string const & module, module_primary_actions & actions )
 {
     // module -> [ header, header... ]
@@ -173,7 +181,7 @@ static void scan_module_dependencies( std::string const & module, module_primary
     // header -> included from [ header, header... ]
     std::map< std::string, std::set< std::string > > from;
 
-    fs::path dir = fs::path( "libs" ) / module / "include";
+    fs::path dir = module_include_path( module );
     size_t n = dir.generic_string().size();
 
     fs::recursive_directory_iterator it( dir ), last;

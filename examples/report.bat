@@ -17,7 +17,6 @@ SET FOOTER=Generated on %DATE% %TIME% from revision %REV%
 SET OUTDIR=..\report-%SHREV%
 
 mkdir %OUTDIR%
-mkdir %OUTDIR%\numeric
 
 %BOOSTDEP% --list-modules > %OUTDIR%\list-modules.txt
 
