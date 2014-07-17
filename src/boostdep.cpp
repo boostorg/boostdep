@@ -9,6 +9,7 @@
 
 
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -190,7 +191,7 @@ static void scan_module_dependencies( std::string const & module, module_primary
     {
         std::string header = it->path().generic_string().substr( n+1 );
 
-        std::ifstream is( it->path().c_str() );
+        fs::ifstream is( it->path().c_str() );
 
         scan_header_dependencies( header, is, deps, from );
     }
