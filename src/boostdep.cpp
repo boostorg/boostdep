@@ -191,7 +191,7 @@ static void scan_module_dependencies( std::string const & module, module_primary
     {
         std::string header = it->path().generic_string().substr( n+1 );
 
-        fs::ifstream is( it->path().c_str() );
+        fs::ifstream is( it->path() );
 
         scan_header_dependencies( header, is, deps, from );
     }
