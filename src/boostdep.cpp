@@ -1314,7 +1314,7 @@ int main( int argc, char const* argv[] )
             if( i + 1 < argc )
             {
                 enable_secondary( secondary );
-                output_header_report( option, html );
+                output_header_report( argv[ ++i ], html );
             }
         }
         else if( option == "--module-levels" )
