@@ -12,7 +12,9 @@ FOR /f %%i IN ('git rev-parse HEAD') DO @SET REV=%%i
 
 FOR /f %%i IN ('git rev-parse --short HEAD') DO @SET SHREV=%%i
 
-SET FOOTER=Generated on %DATE% %TIME% from revision %REV%
+FOR /f %%i IN ('git rev-parse --abbrev-ref HEAD') DO @SET BRANCH=%%i
+
+SET FOOTER=Generated on %DATE% %TIME% from revision %REV% on branch '%BRANCH%'
 
 SET OUTDIR=..\report-%SHREV%
 
