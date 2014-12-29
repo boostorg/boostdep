@@ -6,7 +6,7 @@ REM It needs to be run from the Boost root.
 REM git pull
 REM git submodule update --init
 
-SET BOOSTDEP=bin.v2\tools\boostdep\src\msvc-8.0\release\link-static\threading-multi\boostdep.exe
+SET BOOSTDEP=dist\bin\boostdep.exe
 
 FOR /f %%i IN ('git rev-parse HEAD') DO @SET REV=%%i
 
