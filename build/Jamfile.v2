@@ -8,10 +8,20 @@ project boostdep ;
 
 exe boostdep :
     # sources
-    boostdep.cpp
+    ../src/boostdep.cpp
     /boost//filesystem :
     # requirements
     :
     # default build
     <variant>release
+    ;
+
+install dist-bin
+    :
+    boostdep
+    :
+    <install-type>EXE
+    <location>../../../dist/bin
+    :
+    release
     ;
