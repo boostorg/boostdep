@@ -180,6 +180,12 @@ static fs::path module_source_path( std::string module )
     return fs::path( "libs" ) / module / "src";
 }
 
+static fs::path module_build_path( std::string module )
+{
+    std::replace( module.begin(), module.end(), '~', '/' );
+    return fs::path( "libs" ) / module / "build";
+}
+
 static void scan_module_dependencies( std::string const & module, module_primary_actions & actions, bool track_sources )
 {
     // module -> [ header, header... ]
@@ -1279,6 +1285,25 @@ static void enable_secondary( bool & secondary, bool track_sources )
     }
 }
 
+static void list_modules()
+{
+    for( std::set< std::string >::iterator i = s_modules.begin(); i != s_modules.end(); ++i )
+    {
+        std::cout << *i << "\n";
+    }
+}
+
+static void list_buildable()
+{
+    for( std::set< std::string >::iterator i = s_modules.begin(); i != s_modules.end(); ++i )
+    {
+		if( fs::exists( module_build_path( *i ) ) && fs::exists( module_source_path( *i ) ) )
+		{
+			std::cout << *i << "\n";
+		}
+    }
+}
+
 int main( int argc, char const* argv[] )
 {
     if( argc < 2 )
@@ -1286,6 +1311,7 @@ int main( int argc, char const* argv[] )
         std::cerr << "Usage:\n\n";
 
         std::cerr << "    boostdep --list-modules\n";
+        std::cerr << "    boostdep --list-buildable\n";
         std::cerr << "    boostdep [--track-sources] --list-dependencies\n";
         std::cerr << "\n";
         std::cerr << "    boostdep [options] --module-overview\n";
@@ -1323,10 +1349,11 @@ int main( int argc, char const* argv[] )
 
         if( option == "--list-modules" )
         {
-            for( std::set< std::string >::iterator i = s_modules.begin(); i != s_modules.end(); ++i )
-            {
-                std::cout << *i << "\n";
-            }
+			list_modules();
+        }
+        else if( option == "--list-buildable" )
+        {
+            list_buildable();
         }
         else if( option == "--title" )
         {
