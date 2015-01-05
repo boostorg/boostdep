@@ -1,25 +1,15 @@
-# Copyright 2014 Peter Dimov
+# Copyright 2014, 2015 Peter Dimov
 #
 # Distributed under the Boost Software License, Version 1.0.
 # See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt
 
-exe boostdep :
-    # sources
-    ../src/boostdep.cpp
-    /boost//filesystem :
-    # requirements
-    :
-    # default build
-    <variant>release
-    ;
+project : default-build release ;
 
-install dist-bin
-    :
-    boostdep
-    :
-    <install-type>EXE
-    <location>../../../dist/bin
-    :
-    release
-    ;
+exe boostdep : ../src/boostdep.cpp /boost//filesystem ;
+
+install dist-bin : boostdep : <location>../../../dist/bin ;
+explicit dist-bin ;
+
+alias install : dist-bin ;
+explicit install ;
