@@ -1084,11 +1084,25 @@ struct module_level_html_actions: public module_level_actions
 
     void module2( std::string const & module, int level )
     {
-        std::cout << " " << module;
+        std::cout << " ";
+
+        bool important = level < unknown_level && level > 1 && level >= level_ - 1;
+
+        if( important )
+        {
+            std::cout << "<strong>";
+        }
+
+        std::cout << module;
 
         if( level < unknown_level )
         {
             std::cout << "<sup>" << level << "</sup>";
+        }
+
+        if( important )
+        {
+            std::cout << "</strong>";
         }
     }
 };
@@ -1317,11 +1331,11 @@ struct module_weight_actions
     virtual void module_end( std::string const & module ) = 0;
 
     virtual void module_primary_start() = 0;
-    virtual void module_primary( std::string const & module ) = 0;
+    virtual void module_primary( std::string const & module, int weight ) = 0;
     virtual void module_primary_end() = 0;
 
     virtual void module_secondary_start() = 0;
-    virtual void module_secondary( std::string const & module ) = 0;
+    virtual void module_secondary( std::string const & module, int weight ) = 0;
     virtual void module_secondary_end() = 0;
 };
 
@@ -1369,19 +1383,19 @@ static void output_module_weight_report( module_weight_actions & actions )
 
     // build weight map
 
-    std::map< int, std::set< std::string > > weight_map;
+    std::map< int, std::set< std::string > > modules_by_weight;
 
     for( std::set< std::string >::const_iterator i = s_modules.begin(); i != s_modules.end(); ++i )
     {
         int w = s_module_deps[ *i ].size() + secondary_deps[ *i ].size();
-        weight_map[ w ].insert( *i );
+        modules_by_weight[ w ].insert( *i );
     }
 
     // output report
 
     actions.heading();
 
-    for( std::map< int, std::set< std::string > >::const_iterator i = weight_map.begin(); i != weight_map.end(); ++i )
+    for( std::map< int, std::set< std::string > >::const_iterator i = modules_by_weight.begin(); i != modules_by_weight.end(); ++i )
     {
         actions.weight_start( i->first );
 
@@ -1395,7 +1409,8 @@ static void output_module_weight_report( module_weight_actions & actions )
 
                 for( std::set< std::string >::const_iterator k = s_module_deps[ *j ].begin(); k != s_module_deps[ *j ].end(); ++k )
                 {
-                    actions.module_primary( *k );
+                    int w = s_module_deps[ *k ].size() + secondary_deps[ *k ].size();
+                    actions.module_primary( *k, w );
                 }
 
                 actions.module_primary_end();
@@ -1407,7 +1422,8 @@ static void output_module_weight_report( module_weight_actions & actions )
 
                 for( std::set< std::string >::const_iterator k = secondary_deps[ *j ].begin(); k != secondary_deps[ *j ].end(); ++k )
                 {
-                    actions.module_secondary( *k );
+                    int w = s_module_deps[ *k ].size() + secondary_deps[ *k ].size();
+                    actions.module_secondary( *k, w );
                 }
 
                 actions.module_secondary_end();
@@ -1452,9 +1468,9 @@ struct module_weight_txt_actions: public module_weight_actions
         std::cout << " ->";
     }
 
-    void module_primary( std::string const & module )
+    void module_primary( std::string const & module, int weight )
     {
-        std::cout << " " << module;
+        std::cout << " " << module << "(" << weight << ")";
     }
 
     void module_primary_end()
@@ -1466,7 +1482,7 @@ struct module_weight_txt_actions: public module_weight_actions
         std::cout << " ->";
     }
 
-    void module_secondary( std::string const & module )
+    void module_secondary( std::string const & module, int /*weight*/ )
     {
         std::cout << " " << module;
     }
@@ -1478,6 +1494,8 @@ struct module_weight_txt_actions: public module_weight_actions
 
 struct module_weight_html_actions: public module_weight_actions
 {
+    int weight_;
+
     void heading()
     {
         std::cout << "<h1>Module Weights</h1>\n";
@@ -1486,6 +1504,7 @@ struct module_weight_html_actions: public module_weight_actions
     void weight_start( int weight )
     {
         std::cout << "  <h2>Weight " << weight << "</h2><ul>\n";
+        weight_ = weight;
     }
 
     void weight_end( int /*weight*/ )
@@ -1508,9 +1527,23 @@ struct module_weight_html_actions: public module_weight_actions
         std::cout << "<br />&#8674;";
     }
 
-    void module_primary( std::string const & module )
+    void module_primary( std::string const & module, int weight )
     {
-        std::cout << " " << module;
+        std::cout << " ";
+
+        bool heavy = weight >= 0.8 * weight_;
+
+        if( heavy )
+        {
+            std::cout << "<strong>";
+        }
+
+        std::cout << module << "<sup>" << weight << "</sup>";
+
+        if( heavy )
+        {
+            std::cout << "</strong>";
+        }
     }
 
     void module_primary_end()
@@ -1522,7 +1555,7 @@ struct module_weight_html_actions: public module_weight_actions
         std::cout << "<br /><span style=\"padding-left: 1em;\">&#8674;";
     }
 
-    void module_secondary( std::string const & module )
+    void module_secondary( std::string const & module, int /*weight*/ )
     {
         std::cout << " " << module;
     }
