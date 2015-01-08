@@ -1,7 +1,7 @@
 
 // boostdep - a tool to generate Boost dependency reports
 //
-// Copyright 2014 Peter Dimov
+// Copyright 2014, 2015 Peter Dimov
 //
 // Distributed under the Boost Software License, Version 1.0.
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -1297,10 +1297,253 @@ static void list_buildable()
 {
     for( std::set< std::string >::iterator i = s_modules.begin(); i != s_modules.end(); ++i )
     {
-		if( fs::exists( module_build_path( *i ) ) && fs::exists( module_source_path( *i ) ) )
-		{
-			std::cout << *i << "\n";
-		}
+        if( fs::exists( module_build_path( *i ) ) && fs::exists( module_source_path( *i ) ) )
+        {
+            std::cout << *i << "\n";
+        }
+    }
+}
+
+// module_weight_report
+
+struct module_weight_actions
+{
+    virtual void heading() = 0;
+
+    virtual void weight_start( int weight ) = 0;
+    virtual void weight_end( int weight ) = 0;
+
+    virtual void module_start( std::string const & module ) = 0;
+    virtual void module_end( std::string const & module ) = 0;
+
+    virtual void module_primary_start() = 0;
+    virtual void module_primary( std::string const & module ) = 0;
+    virtual void module_primary_end() = 0;
+
+    virtual void module_secondary_start() = 0;
+    virtual void module_secondary( std::string const & module ) = 0;
+    virtual void module_secondary_end() = 0;
+};
+
+static void output_module_weight_report( module_weight_actions & actions )
+{
+    // gather secondary dependencies
+
+    struct build_secondary_deps: public module_secondary_actions
+    {
+        std::map< std::string, std::set< std::string > > * pm_;
+
+        build_secondary_deps( std::map< std::string, std::set< std::string > > * pm ): pm_( pm )
+        {
+        }
+
+        std::string module_;
+
+        void heading( std::string const & module )
+        {
+            module_ = module;
+        }
+
+        void module_start( std::string const & /*module*/ )
+        {
+        }
+
+        void module_end( std::string const & /*module*/ )
+        {
+        }
+
+        void module_adds( std::string const & module )
+        {
+            (*pm_)[ module_ ].insert( module );
+        }
+    };
+
+    std::map< std::string, std::set< std::string > > secondary_deps;
+
+    build_secondary_deps bsd( &secondary_deps );
+
+    for( std::set< std::string >::const_iterator i = s_modules.begin(); i != s_modules.end(); ++i )
+    {
+        output_module_secondary_report( *i, bsd );
+    }
+
+    // build weight map
+
+    std::map< int, std::set< std::string > > weight_map;
+
+    for( std::set< std::string >::const_iterator i = s_modules.begin(); i != s_modules.end(); ++i )
+    {
+        int w = s_module_deps[ *i ].size() + secondary_deps[ *i ].size();
+        weight_map[ w ].insert( *i );
+    }
+
+    // output report
+
+    actions.heading();
+
+    for( std::map< int, std::set< std::string > >::const_iterator i = weight_map.begin(); i != weight_map.end(); ++i )
+    {
+        actions.weight_start( i->first );
+
+        for( std::set< std::string >::const_iterator j = i->second.begin(); j != i->second.end(); ++j )
+        {
+            actions.module_start( *j );
+
+            if( !s_module_deps[ *j ].empty() )
+            {
+                actions.module_primary_start();
+
+                for( std::set< std::string >::const_iterator k = s_module_deps[ *j ].begin(); k != s_module_deps[ *j ].end(); ++k )
+                {
+                    actions.module_primary( *k );
+                }
+
+                actions.module_primary_end();
+            }
+
+            if( !secondary_deps[ *j ].empty() )
+            {
+                actions.module_secondary_start();
+
+                for( std::set< std::string >::const_iterator k = secondary_deps[ *j ].begin(); k != secondary_deps[ *j ].end(); ++k )
+                {
+                    actions.module_secondary( *k );
+                }
+
+                actions.module_secondary_end();
+            }
+
+            actions.module_end( *j );
+        }
+
+        actions.weight_end( i->first );
+    }
+}
+
+struct module_weight_txt_actions: public module_weight_actions
+{
+    void heading()
+    {
+        std::cout << "Module Weights:\n\n";
+    }
+
+    void weight_start( int weight )
+    {
+        std::cout << "Weight " << weight << ":\n";
+    }
+
+    void weight_end( int /*weight*/ )
+    {
+        std::cout << "\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+        std::cout << "    " << module;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+        std::cout << "\n";
+    }
+
+    void module_primary_start()
+    {
+        std::cout << " ->";
+    }
+
+    void module_primary( std::string const & module )
+    {
+        std::cout << " " << module;
+    }
+
+    void module_primary_end()
+    {
+    }
+
+    void module_secondary_start()
+    {
+        std::cout << " ->";
+    }
+
+    void module_secondary( std::string const & module )
+    {
+        std::cout << " " << module;
+    }
+
+    void module_secondary_end()
+    {
+    }
+};
+
+struct module_weight_html_actions: public module_weight_actions
+{
+    void heading()
+    {
+        std::cout << "<h1>Module Weights</h1>\n";
+    }
+
+    void weight_start( int weight )
+    {
+        std::cout << "  <h2>Weight " << weight << "</h2><ul>\n";
+    }
+
+    void weight_end( int /*weight*/ )
+    {
+        std::cout << "  </ul>\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+        std::cout << "    <li><a href =\"" << module << ".html\">" << module << "</a><small>";
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+        std::cout << "</small></li>\n";
+    }
+
+    void module_primary_start()
+    {
+        std::cout << "<br />&#8674;";
+    }
+
+    void module_primary( std::string const & module )
+    {
+        std::cout << " " << module;
+    }
+
+    void module_primary_end()
+    {
+    }
+
+    void module_secondary_start()
+    {
+        std::cout << "<br /><span style=\"padding-left: 1em;\">&#8674;";
+    }
+
+    void module_secondary( std::string const & module )
+    {
+        std::cout << " " << module;
+    }
+
+    void module_secondary_end()
+    {
+        std::cout << "</span>";
+    }
+};
+
+static void output_module_weight_report( bool html )
+{
+    if( html )
+    {
+        module_weight_html_actions actions;
+        output_module_weight_report( actions );
+    }
+    else
+    {
+        module_weight_txt_actions actions;
+        output_module_weight_report( actions );
     }
 }
 
@@ -1308,21 +1551,24 @@ int main( int argc, char const* argv[] )
 {
     if( argc < 2 )
     {
-        std::cerr << "Usage:\n\n";
+        std::cout <<
 
-        std::cerr << "    boostdep --list-modules\n";
-        std::cerr << "    boostdep --list-buildable\n";
-        std::cerr << "    boostdep [--track-sources] --list-dependencies\n";
-        std::cerr << "\n";
-        std::cerr << "    boostdep [options] --module-overview\n";
-        std::cerr << "    boostdep [options] --module-levels\n";
-        std::cerr << "\n";
-        std::cerr << "    boostdep [options] [--primary] <module>\n";
-        std::cerr << "    boostdep [options] --secondary <module>\n";
-        std::cerr << "    boostdep [options] --reverse <module>\n";
-        std::cerr << "    boostdep [options] [--header] <header>\n";
-        std::cerr << "\n";
-        std::cerr << "    [options]: [--track-sources] [--title <title>] [--footer <footer>] [--html]\n";
+            "Usage:\n"
+            "\n"
+            "    boostdep --list-modules\n";
+            "    boostdep --list-buildable\n";
+            "    boostdep [--track-sources] --list-dependencies\n";
+            "\n";
+            "    boostdep [options] --module-overview\n";
+            "    boostdep [options] --module-levels\n";
+            "    boostdep [options] --module-weights\n";
+            "\n";
+            "    boostdep [options] [--primary] <module>\n";
+            "    boostdep [options] --secondary <module>\n";
+            "    boostdep [options] --reverse <module>\n";
+            "    boostdep [options] [--header] <header>\n";
+            "\n";
+            "    [options]: [--track-sources] [--title <title>] [--footer <footer>] [--html]\n";
 
         return -1;
     }
@@ -1349,7 +1595,7 @@ int main( int argc, char const* argv[] )
 
         if( option == "--list-modules" )
         {
-			list_modules();
+            list_modules();
         }
         else if( option == "--list-buildable" )
         {
@@ -1421,6 +1667,11 @@ int main( int argc, char const* argv[] )
         {
             enable_secondary( secondary, track_sources );
             output_module_overview_report( html );
+        }
+        else if( option == "--module-weights" )
+        {
+            enable_secondary( secondary, track_sources );
+            output_module_weight_report( html );
         }
         else if( option == "--list-dependencies" )
         {
