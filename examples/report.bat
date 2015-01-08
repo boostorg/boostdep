@@ -20,7 +20,7 @@ FOR /f %%i IN ('git rev-parse --abbrev-ref HEAD') DO @SET BRANCH=%%i
 
 SET FOOTER=Generated on %DATE% %TIME% from revision %REV% on branch '%BRANCH%'
 
-SET OUTDIR=..\report-%SHREV%
+SET OUTDIR=..\report-%BRANCH%-%SHREV%
 
 mkdir %OUTDIR%
 

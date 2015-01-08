@@ -1480,7 +1480,7 @@ struct module_weight_html_actions: public module_weight_actions
 {
     void heading()
     {
-        std::cout << "<h1>Module Weight</h1>\n";
+        std::cout << "<h1>Module Weights</h1>\n";
     }
 
     void weight_start( int weight )
@@ -1519,7 +1519,7 @@ struct module_weight_html_actions: public module_weight_actions
 
     void module_secondary_start()
     {
-        std::cout << "<br />&#8674;";
+        std::cout << "<br /><span style=\"padding-left: 1em;\">&#8674;";
     }
 
     void module_secondary( std::string const & module )
@@ -1529,6 +1529,7 @@ struct module_weight_html_actions: public module_weight_actions
 
     void module_secondary_end()
     {
+        std::cout << "</span>";
     }
 };
 
