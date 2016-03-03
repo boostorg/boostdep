@@ -190,7 +190,7 @@ static fs::path module_build_path( std::string module )
     return fs::path( "libs" ) / module / "build";
 }
 
-static void scan_module_dependencies( std::string const & module, module_primary_actions & actions, bool track_sources )
+static void scan_module_dependencies( std::string const & module, module_primary_actions & actions, bool track_sources, bool include_self )
 {
     // module -> [ header, header... ]
     std::map< std::string, std::set< std::string > > deps;
@@ -238,7 +238,7 @@ static void scan_module_dependencies( std::string const & module, module_primary
 
     for( std::map< std::string, std::set< std::string > >::iterator i = deps.begin(); i != deps.end(); ++i )
     {
-        if( i->first == module ) continue;
+        if( i->first == module && !include_self ) continue;
 
         actions.module_start( i->first );
 
@@ -275,6 +275,7 @@ static std::map< std::string, std::set< std::string > > s_header_includes;
 struct build_mdmap_actions: public module_primary_actions
 {
     std::string module_;
+    std::string module2_;
     std::string header_;
 
     void heading( std::string const & module )
@@ -284,8 +285,13 @@ struct build_mdmap_actions: public module_primary_actions
 
     void module_start( std::string const & module )
     {
-        s_module_deps[ module_ ].insert( module );
-        s_reverse_deps[ module ].insert( module_ );
+        if( module != module_ )
+        {
+            s_module_deps[ module_ ].insert( module );
+            s_reverse_deps[ module ].insert( module_ );
+        }
+
+        module2_ = module;
     }
 
     void module_end( std::string const & /*module*/ )
@@ -303,7 +309,11 @@ struct build_mdmap_actions: public module_primary_actions
 
     void from_header( std::string const & header )
     {
-        s_header_deps[ header_ ].insert( header );
+        if( module_ != module2_ )
+        {
+            s_header_deps[ header_ ].insert( header );
+        }
+
         s_header_includes[ header ].insert( header_ );
     }
 };
@@ -313,7 +323,7 @@ static void build_module_dependency_map( bool track_sources )
     for( std::set< std::string >::iterator i = s_modules.begin(); i != s_modules.end(); ++i )
     {
         build_mdmap_actions actions;
-        scan_module_dependencies( *i, actions, track_sources );
+        scan_module_dependencies( *i, actions, track_sources, true );
     }
 }
 
@@ -321,7 +331,7 @@ static void output_module_primary_report( std::string const & module, module_pri
 {
     try
     {
-        scan_module_dependencies( module, actions, track_sources );
+        scan_module_dependencies( module, actions, track_sources, false );
     }
     catch( fs::filesystem_error const & x )
     {
@@ -1604,61 +1614,65 @@ static void output_module_subset_report( std::string const & module, module_subs
 {
     // build header closure
 
+    std::set<std::string> const & headers = s_module_headers[ module ];
+
     // header -> (header)*
-    std::map< std::string, std::set<std::string> > inc2 = s_header_includes;
+    std::map< std::string, std::set<std::string> > inc2;
 
     // (header, header) -> path
     std::map< std::pair<std::string, std::string>, std::vector<std::string> > paths;
 
-    for( std::map< std::string, std::set<std::string> >::const_iterator i = inc2.begin(); i != inc2.end(); ++i )
+    for( std::set<std::string>::const_iterator i = headers.begin(); i != headers.end(); ++i )
     {
-        for( std::set<std::string>::const_iterator j = i->second.begin(); j != i->second.end(); ++j )
+        std::set<std::string> & s = inc2[ *i ];
+
+        s = s_header_includes[ *i ];
+
+        for( std::set<std::string>::const_iterator j = s.begin(); j != s.end(); ++j )
         {
-            std::vector<std::string> & v = paths[ std::make_pair( i->first, *j ) ];
+            std::vector<std::string> & v = paths[ std::make_pair( *i, *j ) ];
 
             v.resize( 0 );
-            v.push_back( i->first );
+            v.push_back( *i );
             v.push_back( *j );
         }
     }
 
     for( ;; )
     {
-        std::map< std::string, std::set<std::string> > inc3 = inc2;
+        bool r = false;
 
-        for( std::map< std::string, std::set<std::string> >::const_iterator i = inc2.begin(); i != inc2.end(); ++i )
+        for( std::map< std::string, std::set<std::string> >::iterator i = inc2.begin(); i != inc2.end(); ++i )
         {
-            for( std::set<std::string>::const_iterator j = i->second.begin(); j != i->second.end(); ++j )
+            std::set<std::string> & s2 = i->second;
+
+            for( std::set<std::string>::const_iterator j = s2.begin(); j != s2.end(); ++j )
             {
-                std::set<std::string> const & s = inc3[ *j ];
+                std::set<std::string> const & s = s_header_includes[ *j ];
 
                 for( std::set<std::string>::const_iterator k = s.begin(); k != s.end(); ++k )
                 {
-                    std::set<std::string> & s2 = inc3[ i->first ];
-
                     if( s2.count( *k ) == 0 )
                     {
-                        inc3[ i->first ].insert( *k );
+                        s2.insert( *k );
 
                         std::vector<std::string> const & v1 = paths[ std::make_pair( i->first, *j ) ];
                         std::vector<std::string> & v2 = paths[ std::make_pair( i->first, *k ) ];
 
                         v2 = v1;
                         v2.push_back( *k );
+
+                        r = true;
                     }
                 }
             }
         }
 
-        if( inc2 == inc3 ) break;
-
-        inc2 = inc3;
+        if( !r ) break;
     }
 
-    // module -> path [header -> header -> header]
-    std::map< std::string, std::vector<std::string> > subset;
-
-    std::set<std::string> const & headers = s_module_headers[ module ];
+    // module -> header -> path [header -> header -> header]
+    std::map< std::string, std::map< std::string, std::vector<std::string> > > subset;
 
     for( std::set<std::string>::const_iterator i = headers.begin(); i != headers.end(); ++i )
     {
@@ -1668,19 +1682,30 @@ static void output_module_subset_report( std::string const & module, module_subs
         {
             std::string const & m = s_header_map[ *j ];
 
-            if( !m.empty() && subset.count( m ) == 0 )
+            if( m.empty() ) continue;
+
+            std::vector<std::string> const & path = paths[ std::make_pair( *i, *j ) ];
+
+            if( subset.count( m ) == 0 || subset[ m ].count( *i ) == 0 || subset[ m ][ *i ].size() > path.size() )
             {
-                subset[ m ] = paths[ std::make_pair( *i, *j ) ];
+                subset[ m ][ *i ] = path;
             }
         }
     }
 
     actions.heading( module );
 
-    for( std::map< std::string, std::vector<std::string> >::const_iterator i = subset.begin(); i != subset.end(); ++i )
+    for( std::map< std::string, std::map< std::string, std::vector<std::string> > >::const_iterator i = subset.begin(); i != subset.end(); ++i )
     {
         actions.module_start( i->first );
-        actions.from_path( i->second );
+
+        int k = 0;
+
+        for( std::map< std::string, std::vector<std::string> >::const_iterator j = i->second.begin(); j != i->second.end() && k < 4; ++j, ++k )
+        {
+            actions.from_path( j->second );
+        }
+
         actions.module_end( i->first );
     }
 }
@@ -1731,16 +1756,17 @@ struct module_subset_html_actions: public module_subset_actions
 
     void module_start( std::string const & module )
     {
-        std::cout << "  <h2 id=\"subset-" << module << "\"><a href=\"" << module << ".html\"><em>" << module << "</em></a></h2>\n";
+        std::cout << "  <h2 id=\"subset-" << module << "\"><a href=\"" << module << ".html\"><em>" << module << "</em></a></h2><ul>\n";
     }
 
     void module_end( std::string const & /*module*/ )
     {
+        std::cout << "</ul>\n";
     }
 
     void from_path( std::vector<std::string> const & path )
     {
-        std::cout << "    <p style=\"padding-left: 1em;\">";
+        std::cout << "    <li>";
 
         for( std::vector<std::string>::const_iterator i = path.begin(); i != path.end(); ++i )
         {
@@ -1752,7 +1778,7 @@ struct module_subset_html_actions: public module_subset_actions
             std::cout << "<code>" << *i << "</code>";
         }
 
-        std::cout << "</p>\n";
+        std::cout << "</li>\n";
     }
 };
 
