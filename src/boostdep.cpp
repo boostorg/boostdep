@@ -1697,6 +1697,8 @@ static void output_module_subset_report( std::string const & module, module_subs
 
     for( std::map< std::string, std::map< std::string, std::vector<std::string> > >::const_iterator i = subset.begin(); i != subset.end(); ++i )
     {
+        if( i->first == module ) continue;
+
         actions.module_start( i->first );
 
         int k = 0;
