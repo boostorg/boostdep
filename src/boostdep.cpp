@@ -1,7 +1,7 @@
 
 // boostdep - a tool to generate Boost dependency reports
 //
-// Copyright 2014, 2015 Peter Dimov
+// Copyright 2014, 2015, 2016 Peter Dimov
 //
 // Distributed under the Boost Software License, Version 1.0.
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -1817,6 +1817,7 @@ int main( int argc, char const* argv[] )
             "    boostdep [options] [--primary] <module>\n"
             "    boostdep [options] --secondary <module>\n"
             "    boostdep [options] --reverse <module>\n"
+            "    boostdep [options] --subset <module>\n"
             "    boostdep [options] [--header] <header>\n"
             "\n"
             "    [options]: [--track-sources] [--title <title>] [--footer <footer>] [--html]\n";
