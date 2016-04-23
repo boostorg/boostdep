@@ -1616,11 +1616,34 @@ struct module_subset_actions
     virtual void from_path( std::vector<std::string> const & path ) = 0;
 };
 
-static void output_module_subset_report( std::string const & module, module_subset_actions & actions )
+static void add_module_headers( fs::path const & dir, std::set<std::string> & headers )
+{
+    if( fs::exists( dir ) )
+    {
+        fs::recursive_directory_iterator it( dir ), last;
+
+        for( ; it != last; ++it )
+        {
+            headers.insert( it->path().generic_string() );
+        }
+    }
+}
+
+static void output_module_subset_report( std::string const & module, bool track_sources, bool track_tests, module_subset_actions & actions )
 {
     // build header closure
 
-    std::set<std::string> const & headers = s_module_headers[ module ];
+    std::set<std::string> headers = s_module_headers[ module ];
+
+    if( track_sources )
+    {
+        add_module_headers( module_source_path( module ), headers );
+    }
+
+    if( track_tests )
+    {
+        add_module_headers( module_test_path( module ), headers );
+    }
 
     // header -> (header)*
     std::map< std::string, std::set<std::string> > inc2;
@@ -1790,17 +1813,17 @@ struct module_subset_html_actions: public module_subset_actions
     }
 };
 
-static void output_module_subset_report( std::string const & module, bool html )
+static void output_module_subset_report( std::string const & module, bool track_sources, bool track_tests, bool html )
 {
     if( html )
     {
         module_subset_html_actions actions;
-        output_module_subset_report( module, actions );
+        output_module_subset_report( module, track_sources, track_tests, actions );
     }
     else
     {
         module_subset_txt_actions actions;
-        output_module_subset_report( module, actions );
+        output_module_subset_report( module, track_sources, track_tests, actions );
     }
 }
 
@@ -1935,7 +1958,7 @@ int main( int argc, char const* argv[] )
             if( i + 1 < argc )
             {
                 enable_secondary( secondary, track_sources, track_tests );
-                output_module_subset_report( argv[ ++i ], html );
+                output_module_subset_report( argv[ ++i ], track_sources, track_tests, html );
             }
         }
         else if( option == "--module-levels" )
