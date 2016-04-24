@@ -46,12 +46,13 @@ static void scan_module_headers( fs::path const & path )
 
         for( ; it != last; ++it )
         {
-            fs::directory_entry const & e = *it;
+            if( it->status().type() == fs::directory_file )
+            {
+                continue;
+            }
 
-            std::string p2 = e.path().generic_string();
+            std::string p2 = it->path().generic_string();
             p2 = p2.substr( n+1 );
-
-            // std::cout << module << ": " << p2 << std::endl;
 
             s_header_map[ p2 ] = module;
             s_module_headers[ module ].insert( p2 );
@@ -206,6 +207,11 @@ static void scan_module_path( fs::path const & dir, bool remove_prefix, std::map
 
         for( ; it != last; ++it )
         {
+            if( it->status().type() == fs::directory_file )
+            {
+                continue;
+            }
+
             std::string header = it->path().generic_string();
 
             if( remove_prefix )
@@ -1624,6 +1630,11 @@ static void add_module_headers( fs::path const & dir, std::set<std::string> & he
 
         for( ; it != last; ++it )
         {
+            if( it->status().type() == fs::directory_file )
+            {
+                continue;
+            }
+
             headers.insert( it->path().generic_string() );
         }
     }
@@ -1827,6 +1838,37 @@ static void output_module_subset_report( std::string const & module, bool track_
     }
 }
 
+static void list_exceptions()
+{
+    std::string lm;
+
+    for( std::map< std::string, std::set<std::string> >::const_iterator i = s_module_headers.begin(); i != s_module_headers.end(); ++i )
+    {
+        std::string module = i->first;
+
+        std::replace( module.begin(), module.end(), '~', '/' );
+
+        std::string const prefix = "boost/" + module;
+        size_t const n = prefix.size();
+
+        for( std::set< std::string >::const_iterator j = i->second.begin(); j != i->second.end(); ++j )
+        {
+            std::string const & header = *j;
+
+            if( header.substr( 0, n+1 ) != prefix + '/' && header != prefix + ".hpp" )
+            {
+                if( lm != module )
+                {
+                    std::cout << module << ":\n";
+                    lm = module;
+                }
+
+                std::cout << "  " << header << '\n';
+            }
+        }
+    }
+}
+
 int main( int argc, char const* argv[] )
 {
     if( argc < 2 )
@@ -1838,6 +1880,7 @@ int main( int argc, char const* argv[] )
             "    boostdep --list-modules\n"
             "    boostdep --list-buildable\n"
             "    boostdep [--track-sources] [--track-tests] --list-dependencies\n"
+            "    boostdep --list-exceptions\n"
             "\n"
             "    boostdep [options] --module-overview\n"
             "    boostdep [options] --module-levels\n"
@@ -1980,6 +2023,10 @@ int main( int argc, char const* argv[] )
         {
             enable_secondary( secondary, track_sources, track_tests );
             list_dependencies();
+        }
+        else if( option == "--list-exceptions" )
+        {
+            list_exceptions();
         }
         else if( s_modules.count( option ) )
         {
