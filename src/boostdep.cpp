@@ -369,11 +369,9 @@ static void exclude( std::set< std::string > & x, std::set< std::string > const 
     }
 }
 
-static void output_module_secondary_report( std::string const & module, module_secondary_actions & actions )
+static void output_module_secondary_report( std::string const & module, std::set< std::string> deps, module_secondary_actions & actions )
 {
     actions.heading( module );
-
-    std::set< std::string > deps = s_module_deps[ module ];
 
     deps.insert( module );
 
@@ -415,6 +413,11 @@ static void output_module_secondary_report( std::string const & module, module_s
             deps = deps2;
         }
     }
+}
+
+static void output_module_secondary_report( std::string const & module, module_secondary_actions & actions )
+{
+    output_module_secondary_report( module, s_module_deps[ module ], actions );
 }
 
 struct header_inclusion_actions
@@ -1869,6 +1872,94 @@ static void list_exceptions()
     }
 }
 
+struct module_test_primary_actions: public module_primary_actions
+{
+    std::set< std::string > & m_;
+
+    module_test_primary_actions( std::set< std::string > & m ): m_( m )
+    {
+    }
+
+    void heading( std::string const & module )
+    {
+        std::cout << "Test dependencies for " << module << ":\n\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+        std::cout << module << "\n";
+        m_.insert( module );
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void header_start( std::string const & /*header*/ )
+    {
+    }
+
+    void header_end( std::string const & /*header*/ )
+    {
+    }
+
+    void from_header( std::string const & /*header*/ )
+    {
+    }
+};
+
+struct module_test_secondary_actions: public module_secondary_actions
+{
+    std::set< std::string > & m_;
+    std::string m2_;
+
+    module_test_secondary_actions( std::set< std::string > & m ): m_( m )
+    {
+    }
+
+    void heading( std::string const & module )
+    {
+    }
+
+    void module_start( std::string const & module )
+    {
+        m2_ = module;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void module_adds( std::string const & module )
+    {
+        if( m_.count( module ) == 0 )
+        {
+            std::cout << module << " (from " << m2_ << ")\n";
+            m_.insert( module );
+        }
+    }
+};
+
+static void output_module_test_report( std::string const & module )
+{
+    std::set< std::string > m;
+
+    module_test_primary_actions a1( m );
+    output_module_primary_report( module, a1, true, true );
+
+    std::cout << "\n";
+
+    bool secondary = false;
+    enable_secondary( secondary, true, false );
+
+    std::set< std::string > m2( m );
+    m2.insert( module );
+
+    module_test_secondary_actions a2( m2 );
+
+    output_module_secondary_report( module, m, a2 );
+}
+
 int main( int argc, char const* argv[] )
 {
     if( argc < 2 )
@@ -1891,6 +1982,7 @@ int main( int argc, char const* argv[] )
             "    boostdep [options] --reverse <module>\n"
             "    boostdep [options] --subset <module>\n"
             "    boostdep [options] [--header] <header>\n"
+            "    boostdep --test <module>\n"
             "\n"
             "    [options]: [--[no-]track-sources] [--[no-]track-tests]\n"
             "               [--title <title>] [--footer <footer>] [--html]\n";
@@ -2002,6 +2094,13 @@ int main( int argc, char const* argv[] )
             {
                 enable_secondary( secondary, track_sources, track_tests );
                 output_module_subset_report( argv[ ++i ], track_sources, track_tests, html );
+            }
+        }
+        else if( option == "--test" )
+        {
+            if( i + 1 < argc )
+            {
+                output_module_test_report( argv[ ++i ] );
             }
         }
         else if( option == "--module-levels" )

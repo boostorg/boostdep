@@ -244,6 +244,7 @@ Usage:
     boostdep \[options\] --reverse <module>
     boostdep \[options\] --subset <module>
     boostdep \[options\] \[--header\] <header>
+    boostdep --test <module>
 
     \[options\]: \[--track-sources\] \[--title <title>\] \[--footer <footer>\] \[--html\]
 ]
@@ -640,6 +641,16 @@ You can combine =--subset= with the other module report options.
 
 [pre
 dist/bin/boostdep --title "Inclusion Report for <boost/shared_ptr.hpp>" --footer "Generated on 21.05.2015 20:53:11" --html --header boost/shared_ptr.hpp > header-boost-shared_ptr.html
+]
+
+[endsect]
+
+[section --test]
+
+[^boostdep --test /module/] lists the test dependencies of /module/, that is, it lists which modules need to be present so that the tests of /module/ can be run.
+
+[pre
+dist/bin/boostdep --test filesystem
 ]
 
 [endsect]
