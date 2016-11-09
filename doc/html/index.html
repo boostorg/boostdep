@@ -59,6 +59,7 @@
 <dt><span class="section"><a href="index.html#boostdep.reference.reverse">--reverse</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.subset">--subset</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.header">--header</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.test">--test</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_sources">--track-sources</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.title">--title</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.footer">--footer</a></span></dt>
@@ -322,6 +323,7 @@ nothing added to commit but untracked files present (use "git add" to track)
     boostdep [options] --reverse &lt;module&gt;
     boostdep [options] --subset &lt;module&gt;
     boostdep [options] [--header] &lt;header&gt;
+    boostdep --test &lt;module&gt;
 
     [options]: [--track-sources] [--title &lt;title&gt;] [--footer &lt;footer&gt;] [--html]
 </pre>
@@ -580,6 +582,7 @@ FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --title "Dependency Repo
 <dt><span class="section"><a href="index.html#boostdep.reference.reverse">--reverse</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.subset">--subset</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.header">--header</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.test">--test</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_sources">--track-sources</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.title">--title</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.footer">--footer</a></span></dt>
@@ -802,6 +805,19 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.test"></a><a class="link" href="index.html#boostdep.reference.test" title="--test">--test</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">boostdep --test <span class="emphasis"><em>module</em></span></code> lists the
+        test dependencies of <span class="emphasis"><em>module</em></span>, that is, it lists which
+        modules need to be present so that the tests of <span class="emphasis"><em>module</em></span>
+        can be run.
+      </p>
+<pre class="programlisting">dist/bin/boostdep --test filesystem
+</pre>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
 <a name="boostdep.reference.track_sources"></a><a class="link" href="index.html#boostdep.reference.track_sources" title="--track-sources">--track-sources</a>
 </h3></div></div></div>
 <p>
@@ -841,7 +857,7 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: March 04, 2016 at 11:24:14 GMT</small></p></td>
+<td align="left"><p><small>Last revised: November 09, 2016 at 22:11:27 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
