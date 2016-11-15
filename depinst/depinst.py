@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+# depinst.py - installs the dependencies needed to test
+#              a Boost library
+#
+# Copyright 2016 Peter Dimov
+#
+# Distributed under the Boost Software License, Version 1.0.
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+
 import re
 import sys
 import os
@@ -44,7 +53,7 @@ def module_for_header( h, x, gm ):
 
             return m.group( 1 )
 
-        print 'Can not determine module for header', h
+        print 'Cannot determine module for header', h
 
         return None
 
