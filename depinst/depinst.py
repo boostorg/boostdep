@@ -156,7 +156,7 @@ def install_modules( deps, x, gm ):
         if not i:
 
             print 'Installing module', m
-            os.system( 'git submodule -q update --init --depth 1 libs/' + m )
+            os.system( 'git submodule -q update --init libs/' + m )
 
             r += 1
 
