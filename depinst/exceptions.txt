@@ -307,6 +307,8 @@ smart_ptr:
   boost/shared_array.hpp
   boost/shared_ptr.hpp
   boost/weak_ptr.hpp
+stacktrace:
+  boost/detail/winapi/capture_stack.hpp
 system:
   boost/cerrno.hpp
 thread:
@@ -350,6 +352,7 @@ winapi:
   boost/detail/winapi/critical_section.hpp
   boost/detail/winapi/crypt.hpp
   boost/detail/winapi/dbghelp.hpp
+  boost/detail/winapi/debugapi.hpp
   boost/detail/winapi/detail/cast_ptr.hpp
   boost/detail/winapi/directory_management.hpp
   boost/detail/winapi/dll.hpp
