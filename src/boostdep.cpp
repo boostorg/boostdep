@@ -1841,6 +1841,8 @@ static void output_module_subset_report( std::string const & module, bool track_
     }
 }
 
+// --list-exceptions
+
 static void list_exceptions()
 {
     std::string lm;
@@ -1871,6 +1873,8 @@ static void list_exceptions()
         }
     }
 }
+
+// --test
 
 struct module_test_primary_actions: public module_primary_actions
 {
@@ -1917,7 +1921,7 @@ struct module_test_secondary_actions: public module_secondary_actions
     {
     }
 
-    void heading( std::string const & module )
+    void heading( std::string const & /*module*/ )
     {
     }
 
@@ -1960,6 +1964,92 @@ static void output_module_test_report( std::string const & module )
     output_module_secondary_report( module, m, a2 );
 }
 
+// --cmake
+
+struct module_cmake_primary_actions: public module_primary_actions
+{
+    std::set< std::string > & m_;
+
+    module_cmake_primary_actions( std::set< std::string > & m ): m_( m )
+    {
+    }
+
+    void heading( std::string const & )
+    {
+    }
+
+    void module_start( std::string const & module )
+    {
+        m_.insert( module );
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void header_start( std::string const & /*header*/ )
+    {
+    }
+
+    void header_end( std::string const & /*header*/ )
+    {
+    }
+
+    void from_header( std::string const & /*header*/ )
+    {
+    }
+};
+
+static void output_module_cmake_report( std::string const & module )
+{
+    std::set< std::string > m1;
+
+    module_cmake_primary_actions a1( m1 );
+    output_module_primary_report( module, a1, false, false );
+
+    std::set< std::string > m2;
+
+    module_cmake_primary_actions a2( m2 );
+    output_module_primary_report( module, a2, true, false );
+
+    std::cout << "# Generated file. Do not edit.\n\n";
+
+    for( std::set< std::string >::const_iterator i = m1.begin(); i != m1.end(); ++i )
+    {
+        m2.erase( *i );
+        std::cout << "boost_declare_dependency(boost_" << *i << " PUBLIC boost::" << *i << ")\n";
+    }
+
+    std::cout << "\n";
+
+    for( std::set< std::string >::const_iterator i = m2.begin(); i != m2.end(); ++i )
+    {
+        std::cout << "boost_declare_dependency(boost_" << *i << " PRIVATE boost::" << *i << ")\n";
+    }
+}
+
+static bool find_boost_root()
+{
+    for( int i = 0; i < 32; ++i )
+    {
+        if( fs::exists( "Jamroot" ) )
+        {
+            return true;
+        }
+
+        fs::path p = fs::current_path();
+
+        if( p == p.root_path() )
+        {
+            return false;
+        }
+
+        fs::current_path( p.parent_path() );
+    }
+
+    return false;
+}
+
 int main( int argc, char const* argv[] )
 {
     if( argc < 2 )
@@ -1983,11 +2073,18 @@ int main( int argc, char const* argv[] )
             "    boostdep [options] --subset <module>\n"
             "    boostdep [options] [--header] <header>\n"
             "    boostdep --test <module>\n"
+            "    boostdep --cmake <module>\n"
             "\n"
             "    [options]: [--[no-]track-sources] [--[no-]track-tests]\n"
             "               [--title <title>] [--footer <footer>] [--html]\n";
 
         return -1;
+    }
+
+    if( !find_boost_root() )
+    {
+        std::cerr << "boostdep: Could not find Boost root.\n";
+        return -2;
     }
 
     try
@@ -2101,6 +2198,13 @@ int main( int argc, char const* argv[] )
             if( i + 1 < argc )
             {
                 output_module_test_report( argv[ ++i ] );
+            }
+        }
+        else if( option == "--cmake" )
+        {
+            if( i + 1 < argc )
+            {
+                output_module_cmake_report( argv[ ++i ] );
             }
         }
         else if( option == "--module-levels" )
