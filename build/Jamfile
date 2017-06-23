@@ -9,7 +9,3 @@ project : default-build release ;
 exe boostdep : ../src/boostdep.cpp /boost//filesystem ;
 
 install dist-bin : boostdep : <location>../../../dist/bin ;
-explicit dist-bin ;
-
-alias install : dist-bin ;
-explicit install ;
