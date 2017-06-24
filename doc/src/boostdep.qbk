@@ -189,7 +189,7 @@ Once you have the Boost contents which you want to analyze for dependencies, pro
 To build /Boostdep/, issue the following command from the Boost root:
 
 [pre
-b2 tools/boostdep/build//install
+b2 tools/boostdep/build
 ]
 
 This will build /Boostdep/ from source using the default "toolset" (a Boost.Build term meaning "compiler") and if successful,
