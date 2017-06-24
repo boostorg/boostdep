@@ -1,5 +1,5 @@
 [/
-  Copyright 2015 Peter Dimov
+  Copyright 2015-2017 Peter Dimov
 
   Distributed under the Boost Software License, Version 1.0.
 
@@ -10,7 +10,7 @@
 [article Boostdep
   [quickbook 1.6]
   [id boostdep]
-  [copyright 2014, 2015, 2016 Peter Dimov]
+  [copyright 2014-2017 Peter Dimov]
   [license Distributed under the
     [@http://boost.org/LICENSE_1_0.txt Boost Software License, Version 1.0].
   ]
@@ -233,7 +233,9 @@ Usage:
 
     boostdep --list-modules
     boostdep --list-buildable
-    boostdep \[--track-sources\] --list-dependencies
+    boostdep \[--track-sources\] \[--track-tests\] --list-dependencies
+    boostdep --list-exceptions
+    boostdep --list-missing-headers
 
     boostdep \[options\] --module-overview
     boostdep \[options\] --module-levels
@@ -245,8 +247,10 @@ Usage:
     boostdep \[options\] --subset <module>
     boostdep \[options\] \[--header\] <header>
     boostdep --test <module>
+    boostdep --cmake <module>
 
-    \[options\]: \[--track-sources\] \[--title <title>\] \[--footer <footer>\] \[--html\]
+    \[options\]: \[--\[no-\]track-sources\] \[--\[no-\]track-tests\]
+               \[--title <title>\] \[--footer <footer>\] \[--html\]
 ]
 
 (The 1.58.0 version of /Boostdep/ has an unfortunate bug that causes the above output to be truncated after =boostdep --list-modules=.
@@ -508,10 +512,23 @@ module -> dependency1 dependency2 /.../
 ]
 
 By default, only the =include= directory is scanned for `#include` directives. If
-the option =--track-sources= is given, the =src= directory is also scanned.
+the option =--track-sources= is given, the =src= directory is also scanned. If
+the option =--track-tests= is given, the =test= directory is also scanned.
 
 This command is typically used from scripts. The output is virtually identical to
 =--module-overview= in plain text, but slightly more machine-friendly.
+[endsect]
+
+[section --list-exceptions]
+=boostdep --list-exceptions= prints a list of the headers that are not contained into
+the include directory ot their corresponding module.
+
+[endsect]
+
+[section --list-missing-headers]
+=boostdep --list-missing-headers= prints a list of the headers that are included by
+another header, but are missing.
+
 [endsect]
 
 [section --module-overview]
@@ -655,9 +672,22 @@ dist/bin/boostdep --test filesystem
 
 [endsect]
 
+[section --cmake]
+
+[^boostdep --cmake /module/] lists the dependencies of /module/ in a =cmake=-friendly form. This is typically used to generate a =dependencies.cmake= file.
+
+[endsect]
+
 [section --track-sources]
 
 The =--track-sources= option instructs /Boostdep/ to scan the =src= library subdirectory for `#include` directives. By default,
+only the =include= subdirectory is scanned.
+
+[endsect]
+
+[section --track-tests]
+
+The =--track-tests= option instructs /Boostdep/ to scan the =test= library subdirectory for `#include` directives. By default,
 only the =include= subdirectory is scanned.
 
 [endsect]

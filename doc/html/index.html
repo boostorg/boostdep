@@ -22,7 +22,8 @@
 <div>
 <div><h2 class="title">
 <a name="boostdep"></a>Boostdep</h2></div>
-<div><p class="copyright">Copyright &#169; 2014-2016 Peter Dimov</p></div>
+<div><p class="copyright">Copyright &#169; 2014-2017 Peter
+      Dimov</p></div>
 <div><div class="legalnotice">
 <a name="boostdep.legal"></a><p>
         Distributed under the <a href="http://boost.org/LICENSE_1_0.txt" target="_top">Boost
@@ -51,6 +52,8 @@
 <dt><span class="section"><a href="index.html#boostdep.reference.list_modules">--list-modules</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.list_buildable">--list-buildable</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.list_dependencies">--list-dependencies</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.list_exceptions">--list-exceptions</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.list_missing_headers">--list-missing-headers</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_overview">--module-overview</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_levels">--module-levels</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_weights">--module-weights</a></span></dt>
@@ -60,7 +63,9 @@
 <dt><span class="section"><a href="index.html#boostdep.reference.subset">--subset</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.header">--header</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.test">--test</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.cmake">--cmake</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_sources">--track-sources</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.track_tests">--track-tests</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.title">--title</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.footer">--footer</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html">--html</a></span></dt>
@@ -312,7 +317,9 @@ nothing added to commit but untracked files present (use "git add" to track)
 
     boostdep --list-modules
     boostdep --list-buildable
-    boostdep [--track-sources] --list-dependencies
+    boostdep [--track-sources] [--track-tests] --list-dependencies
+    boostdep --list-exceptions
+    boostdep --list-missing-headers
 
     boostdep [options] --module-overview
     boostdep [options] --module-levels
@@ -324,8 +331,10 @@ nothing added to commit but untracked files present (use "git add" to track)
     boostdep [options] --subset &lt;module&gt;
     boostdep [options] [--header] &lt;header&gt;
     boostdep --test &lt;module&gt;
+    boostdep --cmake &lt;module&gt;
 
-    [options]: [--track-sources] [--title &lt;title&gt;] [--footer &lt;footer&gt;] [--html]
+    [options]: [--[no-]track-sources] [--[no-]track-tests]
+               [--title &lt;title&gt;] [--footer &lt;footer&gt;] [--html]
 </pre>
 <p>
         (The 1.58.0 version of <span class="emphasis"><em>Boostdep</em></span> has an unfortunate bug
@@ -574,6 +583,8 @@ FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --title "Dependency Repo
 <dt><span class="section"><a href="index.html#boostdep.reference.list_modules">--list-modules</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.list_buildable">--list-buildable</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.list_dependencies">--list-dependencies</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.list_exceptions">--list-exceptions</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.list_missing_headers">--list-missing-headers</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_overview">--module-overview</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_levels">--module-levels</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_weights">--module-weights</a></span></dt>
@@ -583,7 +594,9 @@ FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --title "Dependency Repo
 <dt><span class="section"><a href="index.html#boostdep.reference.subset">--subset</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.header">--header</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.test">--test</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.cmake">--cmake</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_sources">--track-sources</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.track_tests">--track-tests</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.title">--title</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.footer">--footer</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html">--html</a></span></dt>
@@ -630,12 +643,32 @@ FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --title "Dependency Repo
         By default, only the <code class="literal">include</code> directory is scanned for
         <code class="computeroutput"><span class="preprocessor">#include</span></code> directives. If
         the option <code class="literal">--track-sources</code> is given, the <code class="literal">src</code>
-        directory is also scanned.
+        directory is also scanned. If the option <code class="literal">--track-tests</code>
+        is given, the <code class="literal">test</code> directory is also scanned.
       </p>
 <p>
         This command is typically used from scripts. The output is virtually identical
         to <code class="literal">--module-overview</code> in plain text, but slightly more
         machine-friendly.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.list_exceptions"></a><a class="link" href="index.html#boostdep.reference.list_exceptions" title="--list-exceptions">--list-exceptions</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">boostdep --list-exceptions</code> prints a list of the headers
+        that are not contained into the include directory ot their corresponding
+        module.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.list_missing_headers"></a><a class="link" href="index.html#boostdep.reference.list_missing_headers" title="--list-missing-headers">--list-missing-headers</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">boostdep --list-missing-headers</code> prints a list of the headers
+        that are included by another header, but are missing.
       </p>
 </div>
 <div class="section">
@@ -818,11 +851,32 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.cmake"></a><a class="link" href="index.html#boostdep.reference.cmake" title="--cmake">--cmake</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">boostdep --cmake <span class="emphasis"><em>module</em></span></code> lists the
+        dependencies of <span class="emphasis"><em>module</em></span> in a <code class="literal">cmake</code>-friendly
+        form. This is typically used to generate a <code class="literal">dependencies.cmake</code>
+        file.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
 <a name="boostdep.reference.track_sources"></a><a class="link" href="index.html#boostdep.reference.track_sources" title="--track-sources">--track-sources</a>
 </h3></div></div></div>
 <p>
         The <code class="literal">--track-sources</code> option instructs <span class="emphasis"><em>Boostdep</em></span>
         to scan the <code class="literal">src</code> library subdirectory for <code class="computeroutput"><span class="preprocessor">#include</span></code> directives. By default, only
+        the <code class="literal">include</code> subdirectory is scanned.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.track_tests"></a><a class="link" href="index.html#boostdep.reference.track_tests" title="--track-tests">--track-tests</a>
+</h3></div></div></div>
+<p>
+        The <code class="literal">--track-tests</code> option instructs <span class="emphasis"><em>Boostdep</em></span>
+        to scan the <code class="literal">test</code> library subdirectory for <code class="computeroutput"><span class="preprocessor">#include</span></code> directives. By default, only
         the <code class="literal">include</code> subdirectory is scanned.
       </p>
 </div>
@@ -857,7 +911,7 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: November 09, 2016 at 22:11:27 GMT</small></p></td>
+<td align="left"><p><small>Last revised: June 24, 2017 at 17:55:36 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
