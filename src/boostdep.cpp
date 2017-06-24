@@ -2038,6 +2038,69 @@ static void output_module_cmake_report( std::string const & module )
     }
 }
 
+// --list-missing-headers
+
+struct missing_header_actions: public module_primary_actions
+{
+    std::string module_, module2_;
+
+    void heading( std::string const & module )
+    {
+        module_ = module;
+    }
+
+    void module_start( std::string const & module )
+    {
+        module2_ = module;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void header_start( std::string const & header )
+    {
+        if( module2_ == "(unknown)" )
+        {
+            if( !module_.empty() )
+            {
+                std::cout << module_ << ":\n";
+                module_.clear();
+            }
+
+            std::cout << "    <" << header << ">\n";
+        }
+    }
+
+    void header_end( std::string const & /*header*/ )
+    {
+    }
+
+    void from_header( std::string const & header )
+    {
+        if( module2_ == "(unknown)" )
+        {
+            std::cout << "        from <" << header << ">\n";
+        }
+    }
+};
+
+static void list_missing_headers( std::string const & module )
+{
+    missing_header_actions a;
+    output_module_primary_report( module, a, false, false );
+}
+
+static void list_missing_headers()
+{
+    for( std::set< std::string >::const_iterator i = s_modules.begin(); i != s_modules.end(); ++i )
+    {
+        list_missing_headers( *i );
+    }
+}
+
+//
+
 static bool find_boost_root()
 {
     for( int i = 0; i < 32; ++i )
@@ -2072,6 +2135,7 @@ int main( int argc, char const* argv[] )
             "    boostdep --list-buildable\n"
             "    boostdep [--track-sources] [--track-tests] --list-dependencies\n"
             "    boostdep --list-exceptions\n"
+            "    boostdep --list-missing-headers\n"
             "\n"
             "    boostdep [options] --module-overview\n"
             "    boostdep [options] --module-levels\n"
@@ -2240,6 +2304,10 @@ int main( int argc, char const* argv[] )
         else if( option == "--list-exceptions" )
         {
             list_exceptions();
+        }
+        else if( option == "--list-missing-headers" )
+        {
+            list_missing_headers();
         }
         else if( s_modules.count( option ) )
         {
