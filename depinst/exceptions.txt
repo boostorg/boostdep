@@ -352,6 +352,7 @@ winapi:
   boost/detail/winapi/critical_section.hpp
   boost/detail/winapi/crypt.hpp
   boost/detail/winapi/dbghelp.hpp
+  boost/detail/winapi/debugapi.hpp
   boost/detail/winapi/detail/cast_ptr.hpp
   boost/detail/winapi/directory_management.hpp
   boost/detail/winapi/dll.hpp
