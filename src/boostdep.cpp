@@ -2002,29 +2002,39 @@ struct module_cmake_primary_actions: public module_primary_actions
 
 static void output_module_cmake_report( std::string const & module )
 {
+    std::cout << "# Generated file. Do not edit.\n\n";
+
     std::set< std::string > m1;
 
     module_cmake_primary_actions a1( m1 );
     output_module_primary_report( module, a1, false, false );
 
-    std::set< std::string > m2;
-
-    module_cmake_primary_actions a2( m2 );
-    output_module_primary_report( module, a2, true, false );
-
-    std::cout << "# Generated file. Do not edit.\n\n";
-
-    for( std::set< std::string >::const_iterator i = m1.begin(); i != m1.end(); ++i )
+    if( !fs::exists( module_source_path( module ) ) )
     {
-        m2.erase( *i );
-        std::cout << "boost_declare_dependency(boost_" << *i << " PUBLIC boost::" << *i << ")\n";
+        for( std::set< std::string >::const_iterator i = m1.begin(); i != m1.end(); ++i )
+        {
+            std::cout << "boost_declare_dependency(boost_" << *i << " INTERFACE boost::" << *i << ")\n";
+        }
     }
-
-    std::cout << "\n";
-
-    for( std::set< std::string >::const_iterator i = m2.begin(); i != m2.end(); ++i )
+    else
     {
-        std::cout << "boost_declare_dependency(boost_" << *i << " PRIVATE boost::" << *i << ")\n";
+        std::set< std::string > m2;
+
+        module_cmake_primary_actions a2( m2 );
+        output_module_primary_report( module, a2, true, false );
+
+        for( std::set< std::string >::const_iterator i = m1.begin(); i != m1.end(); ++i )
+        {
+            m2.erase( *i );
+            std::cout << "boost_declare_dependency(boost_" << *i << " PUBLIC boost::" << *i << ")\n";
+        }
+
+        std::cout << "\n";
+
+        for( std::set< std::string >::const_iterator i = m2.begin(); i != m2.end(); ++i )
+        {
+            std::cout << "boost_declare_dependency(boost_" << *i << " PRIVATE boost::" << *i << ")\n";
+        }
     }
 }
 
