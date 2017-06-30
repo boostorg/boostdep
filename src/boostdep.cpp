@@ -2000,8 +2000,22 @@ struct module_cmake_primary_actions: public module_primary_actions
     }
 };
 
-static void output_module_cmake_report( std::string const & module )
+static std::string module_cmake_package( std::string module )
 {
+    std::replace( module.begin(), module.end(), '~', '_' );
+    return "boost_" + module;
+}
+
+static std::string module_cmake_target( std::string module )
+{
+    std::replace( module.begin(), module.end(), '~', '_' );
+    return "boost::" + module;
+}
+
+static void output_module_cmake_report( std::string module )
+{
+    std::replace( module.begin(), module.end(), '/', '~' );
+
     std::cout << "# Generated file. Do not edit.\n\n";
 
     std::set< std::string > m1;
@@ -2013,7 +2027,7 @@ static void output_module_cmake_report( std::string const & module )
     {
         for( std::set< std::string >::const_iterator i = m1.begin(); i != m1.end(); ++i )
         {
-            std::cout << "boost_declare_dependency(boost_" << *i << " INTERFACE boost::" << *i << ")\n";
+            std::cout << "boost_declare_dependency(" << module_cmake_package( *i ) << " INTERFACE " << module_cmake_target( *i ) << ")\n";
         }
     }
     else
@@ -2026,14 +2040,14 @@ static void output_module_cmake_report( std::string const & module )
         for( std::set< std::string >::const_iterator i = m1.begin(); i != m1.end(); ++i )
         {
             m2.erase( *i );
-            std::cout << "boost_declare_dependency(boost_" << *i << " PUBLIC boost::" << *i << ")\n";
+            std::cout << "boost_declare_dependency(" << module_cmake_package( *i ) << " PUBLIC " << module_cmake_target( *i ) << ")\n";
         }
 
         std::cout << "\n";
 
         for( std::set< std::string >::const_iterator i = m2.begin(); i != m2.end(); ++i )
         {
-            std::cout << "boost_declare_dependency(boost_" << *i << " PRIVATE boost::" << *i << ")\n";
+            std::cout << "boost_declare_dependency(" << module_cmake_package( *i ) << " PRIVATE " << module_cmake_target( *i ) << ")\n";
         }
     }
 }
