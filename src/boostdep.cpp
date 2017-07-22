@@ -1966,13 +1966,9 @@ static void output_module_test_report( std::string const & module )
 
 // --cmake
 
-struct module_cmake_primary_actions: public module_primary_actions
+struct collect_primary_dependencies: public module_primary_actions
 {
-    std::set< std::string > & m_;
-
-    module_cmake_primary_actions( std::set< std::string > & m ): m_( m )
-    {
-    }
+    std::set< std::string > set_;
 
     void heading( std::string const & )
     {
@@ -1980,7 +1976,9 @@ struct module_cmake_primary_actions: public module_primary_actions
 
     void module_start( std::string const & module )
     {
-        m_.insert( module );
+        if( module == "(unknown)" ) return;
+
+        set_.insert( module );
     }
 
     void module_end( std::string const & /*module*/ )
@@ -2018,34 +2016,30 @@ static void output_module_cmake_report( std::string module )
 
     std::cout << "# Generated file. Do not edit.\n\n";
 
-    std::set< std::string > m1;
-
-    module_cmake_primary_actions a1( m1 );
+    collect_primary_dependencies a1;
     output_module_primary_report( module, a1, false, false );
 
     if( !fs::exists( module_source_path( module ) ) )
     {
-        for( std::set< std::string >::const_iterator i = m1.begin(); i != m1.end(); ++i )
+        for( std::set< std::string >::const_iterator i = a1.set_.begin(); i != a1.set_.end(); ++i )
         {
             std::cout << "boost_declare_dependency(" << module_cmake_package( *i ) << " INTERFACE " << module_cmake_target( *i ) << ")\n";
         }
     }
     else
     {
-        std::set< std::string > m2;
-
-        module_cmake_primary_actions a2( m2 );
+        collect_primary_dependencies a2;
         output_module_primary_report( module, a2, true, false );
 
-        for( std::set< std::string >::const_iterator i = m1.begin(); i != m1.end(); ++i )
+        for( std::set< std::string >::const_iterator i = a1.set_.begin(); i != a1.set_.end(); ++i )
         {
-            m2.erase( *i );
+            a2.set_.erase( *i );
             std::cout << "boost_declare_dependency(" << module_cmake_package( *i ) << " PUBLIC " << module_cmake_target( *i ) << ")\n";
         }
 
         std::cout << "\n";
 
-        for( std::set< std::string >::const_iterator i = m2.begin(); i != m2.end(); ++i )
+        for( std::set< std::string >::const_iterator i = a2.set_.begin(); i != a2.set_.end(); ++i )
         {
             std::cout << "boost_declare_dependency(" << module_cmake_package( *i ) << " PRIVATE " << module_cmake_target( *i ) << ")\n";
         }
@@ -2156,6 +2150,29 @@ struct primary_pkgconfig_actions: public module_primary_actions
     }
 };
 
+static void output_requires( std::string const & section, std::string const & version, std::set< std::string > const & s )
+{
+    bool first = true;
+
+    for( std::set< std::string >::const_iterator i = s.begin(); i != s.end(); ++i )
+    {
+        if( first )
+        {
+            std::cout << section << ": ";
+            first = false;
+        }
+        else
+        {
+            std::cout << ", ";
+        }
+
+        std::string m2( *i );
+        std::replace( m2.begin(), m2.end(), '~', '_' );
+
+        std::cout << "boost_" << m2 << " = " << version;
+    }
+}
+
 static void output_pkgconfig( std::string const & module, std::string const & version, int argc, char const* argv[] )
 {
     for( int i = 0; i < argc; ++i )
@@ -2172,7 +2189,7 @@ static void output_pkgconfig( std::string const & module, std::string const & ve
     std::replace( m3.begin(), m3.end(), '/', '~' );
 
     std::cout << "Name: boost_" << module << '\n';
-    std::cout << "Description: Boost " << version << ", library '" << module << "'\n";
+    std::cout << "Description: Boost C++ library '" << module << "'\n";
     std::cout << "Version: " << version << '\n';
     std::cout << "URL: http://www.boost.org/libs/" << module << '\n';
     std::cout << "Cflags: -I${includedir}\n";
@@ -2182,14 +2199,27 @@ static void output_pkgconfig( std::string const & module, std::string const & ve
         std::cout << "Libs: -L${libdir} -lboost_" << m2 << "\n";
     }
 
-    primary_pkgconfig_actions actions;
-    actions.version_ = version;
+    collect_primary_dependencies a1;
+    output_module_primary_report( m3, a1, false, false );
 
-    output_module_primary_report( m3, actions, false, false );
-
-    if( !actions.list_.empty() )
+    if( !a1.set_.empty() )
     {
-        std::cout << "Requires.private: " << actions.list_ << '\n';
+        output_requires( "Requires", version, a1.set_ );
+        std::cout << std::endl;
+    }
+
+    collect_primary_dependencies a2;
+    output_module_primary_report( m3, a2, true, false );
+
+    for( std::set< std::string >::const_iterator i = a1.set_.begin(); i != a1.set_.end(); ++i )
+    {
+        a2.set_.erase( *i );
+    }
+
+    if( !a2.set_.empty() )
+    {
+        output_requires( "Requires.private", version, a2.set_ );
+        std::cout << std::endl;
     }
 }
 
