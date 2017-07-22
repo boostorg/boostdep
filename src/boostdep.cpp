@@ -2115,6 +2115,86 @@ static void list_missing_headers()
 
 //
 
+struct primary_pkgconfig_actions: public module_primary_actions
+{
+    std::string version_;
+    std::string list_;
+
+    void heading( std::string const & )
+    {
+    }
+
+    void module_start( std::string const & module )
+    {
+        if( module == "(unknown)" ) return;
+
+        std::string m2( module );
+        std::replace( m2.begin(), m2.end(), '~', '_' );
+
+        if( !list_.empty() )
+        {
+            list_ += ", ";
+        }
+
+        list_ += "boost_" + m2 + " = " + version_;
+    }
+
+    void module_end( std::string const & )
+    {
+    }
+
+    void header_start( std::string const & )
+    {
+    }
+
+    void header_end( std::string const & )
+    {
+    }
+
+    void from_header( std::string const & )
+    {
+    }
+};
+
+static void output_pkgconfig( std::string const & module, std::string const & version, int argc, char const* argv[] )
+{
+    for( int i = 0; i < argc; ++i )
+    {
+        std::cout << argv[ i ] << '\n';
+    }
+
+    std::cout << '\n';
+
+    std::string m2( module );
+    std::replace( m2.begin(), m2.end(), '/', '_' );
+
+    std::string m3( module );
+    std::replace( m3.begin(), m3.end(), '/', '~' );
+
+    std::cout << "Name: boost_" << module << '\n';
+    std::cout << "Description: Boost " << version << ", library '" << module << "'\n";
+    std::cout << "Version: " << version << '\n';
+    std::cout << "URL: http://www.boost.org/libs/" << module << '\n';
+    std::cout << "Cflags: -I${includedir}\n";
+
+    if( fs::exists( module_build_path( module ) ) && fs::exists( module_source_path( module ) ) )
+    {
+        std::cout << "Libs: -L${libdir} -lboost_" << m2 << "\n";
+    }
+
+    primary_pkgconfig_actions actions;
+    actions.version_ = version;
+
+    output_module_primary_report( m3, actions, false, false );
+
+    if( !actions.list_.empty() )
+    {
+        std::cout << "Requires.private: " << actions.list_ << '\n';
+    }
+}
+
+//
+
 static bool find_boost_root()
 {
     for( int i = 0; i < 32; ++i )
@@ -2162,6 +2242,7 @@ int main( int argc, char const* argv[] )
             "    boostdep [options] [--header] <header>\n"
             "    boostdep --test <module>\n"
             "    boostdep --cmake <module>\n"
+            "    boostdep --pkgconfig <module> <version> [<var>=<value>] [<var>=<value>]...\n"
             "\n"
             "    [options]: [--[no-]track-sources] [--[no-]track-tests]\n"
             "               [--title <title>] [--footer <footer>] [--html]\n";
@@ -2322,6 +2403,24 @@ int main( int argc, char const* argv[] )
         else if( option == "--list-missing-headers" )
         {
             list_missing_headers();
+        }
+        else if( option == "--pkgconfig" )
+        {
+            if( i + 2 < argc )
+            {
+                std::string module = argv[ ++i ];
+                std::string version = argv[ ++i ];
+
+                ++i;
+
+                output_pkgconfig( module, version, argc - i, argv + i );
+            }
+            else
+            {
+                std::cerr << "'" << option << "': missing module or version.\n";
+            }
+
+            break;
         }
         else if( s_modules.count( option ) )
         {
