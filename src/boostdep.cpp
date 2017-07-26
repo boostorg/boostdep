@@ -1102,7 +1102,7 @@ struct module_level_html_actions: public module_level_actions
 
     void module_start( std::string const & module )
     {
-        std::cout << "    <li><a href =\"" << module << ".html\">" << module << "</a><small>";
+        std::cout << "    <li><a href=\"" << module << ".html\">" << module << "</a><small>";
 
         if( level_ > 0 )
         {
@@ -1228,7 +1228,7 @@ struct module_overview_html_actions: public module_overview_actions
 
     void module_start( std::string const & module )
     {
-        std::cout << "  <h2><a href =\"" << module << ".html\"><em>" << module << "</em></a></h2><p><small>";
+        std::cout << "  <h2><a href=\"" << module << ".html\"><em>" << module << "</em></a></h2><p><small>";
         deps_ = false;
     }
 
@@ -1547,7 +1547,7 @@ struct module_weight_html_actions: public module_weight_actions
 
     void module_start( std::string const & module )
     {
-        std::cout << "    <li><a href =\"" << module << ".html\">" << module << "</a><small>";
+        std::cout << "    <li><a href=\"" << module << ".html\">" << module << "</a><small>";
     }
 
     void module_end( std::string const & /*module*/ )
