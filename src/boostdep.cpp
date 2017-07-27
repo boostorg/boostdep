@@ -1587,7 +1587,7 @@ struct module_weight_html_actions: public module_weight_actions
 
     void module_end( std::string const & /*module*/ )
     {
-        std::cout << "</small></li>\n";
+        std::cout << "\n";
     }
 
     void module_primary_start()
