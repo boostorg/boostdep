@@ -1091,18 +1091,14 @@ struct module_level_html_actions: public module_level_actions
 
     void level_start( int level )
     {
-        std::cout << "  <h2>Level ";
-
         if( level >= unknown_level )
         {
-            std::cout << "<em>undetermined</em>";
+            std::cout << "  <h2>Level <em>undetermined</em></h2>\n";
         }
         else
         {
-            std::cout << level;
+            std::cout << "  <h2 id='level:" << level << "'>Level " << level << "</h2>\n";
         }
-
-        std::cout << "</h2>\n";
 
         level_ = level;
     }
@@ -1113,7 +1109,7 @@ struct module_level_html_actions: public module_level_actions
 
     void module_start( std::string const & module )
     {
-        std::cout << "    <h3><a href=\"" << module << ".html\">" << module << "</a></h3><p class='primary-list'>";
+        std::cout << "    <h3 id='" << module << "'><a href=\"" << module << ".html\">" << module << "</a></h3><p class='primary-list'>";
     }
 
     void module_end( std::string const & /*module*/ )
@@ -1244,7 +1240,7 @@ struct module_overview_html_actions: public module_overview_actions
 
     void module_start( std::string const & module )
     {
-        std::cout << "  <h2><a href=\"" << module << ".html\"><em>" << module << "</em></a></h2><p class='primary-list'>";
+        std::cout << "  <h2 id='" << module << "'><a href=\"" << module << ".html\"><em>" << module << "</em></a></h2><p class='primary-list'>";
     }
 
     void module_end( std::string const & /*module*/ )
@@ -1572,7 +1568,7 @@ struct module_weight_html_actions: public module_weight_actions
 
     void weight_start( int weight )
     {
-        std::cout << "  <h2>Weight " << weight << "</h2>\n";
+        std::cout << "  <h2 id='weight:" << weight << "'>Weight " << weight << "</h2>\n";
         weight_ = weight;
     }
 
@@ -1582,7 +1578,7 @@ struct module_weight_html_actions: public module_weight_actions
 
     void module_start( std::string const & module )
     {
-        std::cout << "    <h3><a href=\"" << module << ".html\">" << module << "</a></h3>";
+        std::cout << "    <h3 id='" << module << "'><a href=\"" << module << ".html\">" << module << "</a></h3>";
     }
 
     void module_end( std::string const & /*module*/ )
