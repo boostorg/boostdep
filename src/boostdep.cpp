@@ -1675,21 +1675,9 @@ static void add_module_headers( fs::path const & dir, std::set<std::string> & he
     }
 }
 
-static void output_module_subset_report( std::string const & module, bool track_sources, bool track_tests, module_subset_actions & actions )
+static void output_module_subset_report_( std::string const & module, std::set<std::string> const & headers, module_subset_actions & actions )
 {
     // build header closure
-
-    std::set<std::string> headers = s_module_headers[ module ];
-
-    if( track_sources )
-    {
-        add_module_headers( module_source_path( module ), headers );
-    }
-
-    if( track_tests )
-    {
-        add_module_headers( module_test_path( module ), headers );
-    }
 
     // header -> (header)*
     std::map< std::string, std::set<std::string> > inc2;
@@ -1785,6 +1773,23 @@ static void output_module_subset_report( std::string const & module, bool track_
 
         actions.module_end( i->first );
     }
+}
+
+static void output_module_subset_report( std::string const & module, bool track_sources, bool track_tests, module_subset_actions & actions )
+{
+    std::set<std::string> headers = s_module_headers[ module ];
+
+    if( track_sources )
+    {
+        add_module_headers( module_source_path( module ), headers );
+    }
+
+    if( track_tests )
+    {
+        add_module_headers( module_test_path( module ), headers );
+    }
+
+    output_module_subset_report_( module, headers, actions );
 }
 
 struct module_subset_txt_actions: public module_subset_actions
@@ -2139,7 +2144,7 @@ static void list_missing_headers()
     }
 }
 
-//
+// --pkgconfig
 
 struct primary_pkgconfig_actions: public module_primary_actions
 {
@@ -2255,6 +2260,39 @@ static void output_pkgconfig( std::string const & module, std::string const & ve
     }
 }
 
+// --subset-for
+
+static void output_directory_subset_report( std::string const & module, std::set<std::string> const & headers, bool html )
+{
+    for( std::set<std::string>::const_iterator i = headers.begin(); i != headers.end(); ++i )
+    {
+        std::map< std::string, std::set< std::string > > deps;
+        std::map< std::string, std::set< std::string > > from;
+
+        std::ifstream is( i->c_str() );
+        scan_header_dependencies( *i, is, deps, from );
+
+        for( std::map< std::string, std::set< std::string > >::const_iterator j = from.begin(); j != from.end(); ++j )
+        {
+            for( std::set<std::string>::const_iterator k = j->second.begin(); k != j->second.end(); ++k )
+            {
+                s_header_includes[ *k ].insert( j->first );
+            }
+        }
+    }
+
+    if( html )
+    {
+        module_subset_html_actions actions;
+        output_module_subset_report_( module, headers, actions );
+    }
+    else
+    {
+        module_subset_txt_actions actions;
+        output_module_subset_report_( module, headers, actions );
+    }
+}
+
 //
 
 static bool find_boost_root()
@@ -2305,6 +2343,7 @@ int main( int argc, char const* argv[] )
             "    boostdep --test <module>\n"
             "    boostdep --cmake <module>\n"
             "    boostdep --pkgconfig <module> <version> [<var>=<value>] [<var>=<value>]...\n"
+            "    boostdep [options] --subset-for <directory>\n"
             "\n"
             "    [options]: [--[no-]track-sources] [--[no-]track-tests]\n"
             "               [--html-title <title>] [--html-footer <footer>]\n"
@@ -2498,6 +2537,26 @@ int main( int argc, char const* argv[] )
             else
             {
                 std::cerr << "'" << option << "': missing module or version.\n";
+            }
+
+            break;
+        }
+        else if( option == "--subset-for" )
+        {
+            if( i + 1 < argc )
+            {
+                std::string module = argv[ ++i ];
+
+                enable_secondary( secondary, track_sources, track_tests );
+
+                std::set<std::string> headers;
+                add_module_headers( module, headers );
+
+                output_directory_subset_report( module, headers, html );
+            }
+            else
+            {
+                std::cerr << "'" << option << "': missing argument.\n";
             }
 
             break;
