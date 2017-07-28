@@ -64,10 +64,14 @@
 <dt><span class="section"><a href="index.html#boostdep.reference.header">--header</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.test">--test</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.cmake">--cmake</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.pkgconfig">--pkgconfig</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.subset_for">--subset-for</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_sources">--track-sources</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_tests">--track-tests</a></span></dt>
-<dt><span class="section"><a href="index.html#boostdep.reference.title">--title</a></span></dt>
-<dt><span class="section"><a href="index.html#boostdep.reference.footer">--footer</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.html_title">--html-title</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.html_footer">--html-footer</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.html_stylesheet">--html-stylesheet</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.html_prefix">--html-prefix</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html">--html</a></span></dt>
 </dl></dd>
 </dl>
@@ -332,16 +336,14 @@ nothing added to commit but untracked files present (use "git add" to track)
     boostdep [options] [--header] &lt;header&gt;
     boostdep --test &lt;module&gt;
     boostdep --cmake &lt;module&gt;
+    boostdep --pkgconfig &lt;module&gt; &lt;version&gt; [&lt;var&gt;=&lt;value&gt;] [&lt;var&gt;=&lt;value&gt;]...
+    boostdep [options] --subset-for &lt;directory&gt;
 
     [options]: [--[no-]track-sources] [--[no-]track-tests]
-               [--title &lt;title&gt;] [--footer &lt;footer&gt;] [--html]
+               [--html-title &lt;title&gt;] [--html-footer &lt;footer&gt;]
+               [--html-stylesheet &lt;stylesheet&gt;] [--html-prefix &lt;prefix&gt;]
+               [--html]
 </pre>
-<p>
-        (The 1.58.0 version of <span class="emphasis"><em>Boostdep</em></span> has an unfortunate bug
-        that causes the above output to be truncated after <code class="literal">boostdep --list-modules</code>.
-        The rest of the functionality is intact though, so you can still use it as
-        described.)
-      </p>
 </div>
 </div>
 <div class="section">
@@ -527,7 +529,7 @@ wave:
         To make these links work as expected, you can generate HTML reports for each
         module as follows:
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Dependency Report for <span class="emphasis"><em>module</em></span>" --html --primary <span class="emphasis"><em>module</em></span> --secondary <span class="emphasis"><em>module</em></span> --reverse <span class="emphasis"><em>module</em></span> &gt; <span class="emphasis"><em>module</em></span>.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Dependency Report for <span class="emphasis"><em>module</em></span>" --html --primary <span class="emphasis"><em>module</em></span> --secondary <span class="emphasis"><em>module</em></span> --reverse <span class="emphasis"><em>module</em></span> &gt; <span class="emphasis"><em>module</em></span>.html
 </pre>
 <p>
         This step can be automated if you generate a module list first with
@@ -567,11 +569,11 @@ mkdir %OUTDIR%
 
 %BOOSTDEP% --list-modules &gt; %OUTDIR%\list-modules.txt
 
-%BOOSTDEP% --footer "%FOOTER%" --html --module-overview &gt; %OUTDIR%\module-overview.html
-%BOOSTDEP% --footer "%FOOTER%" --html --module-levels &gt; %OUTDIR%\module-levels.html
-%BOOSTDEP% --footer "%FOOTER%" --html --module-weights &gt; %OUTDIR%\module-weights.html
+%BOOSTDEP% --html-footer "%FOOTER%" --html --module-overview &gt; %OUTDIR%\module-overview.html
+%BOOSTDEP% --html-footer "%FOOTER%" --html --module-levels &gt; %OUTDIR%\module-levels.html
+%BOOSTDEP% --html-footer "%FOOTER%" --html --module-weights &gt; %OUTDIR%\module-weights.html
 
-FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --title "Dependency Report for %%i" --footer "%FOOTER%" --html --primary %%i --secondary %%i --reverse %%i &gt; %OUTDIR%%%i.html
+FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --html-title "Dependency Report for %%i" --html-footer "%FOOTER%" --html --primary %%i --secondary %%i --reverse %%i &gt; %OUTDIR%%%i.html
 </pre>
 </div>
 </div>
@@ -595,10 +597,14 @@ FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --title "Dependency Repo
 <dt><span class="section"><a href="index.html#boostdep.reference.header">--header</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.test">--test</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.cmake">--cmake</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.pkgconfig">--pkgconfig</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.subset_for">--subset-for</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_sources">--track-sources</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_tests">--track-tests</a></span></dt>
-<dt><span class="section"><a href="index.html#boostdep.reference.title">--title</a></span></dt>
-<dt><span class="section"><a href="index.html#boostdep.reference.footer">--footer</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.html_title">--html-title</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.html_footer">--html-footer</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.html_stylesheet">--html-stylesheet</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.html_prefix">--html-prefix</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html">--html</a></span></dt>
 </dl></div>
 <div class="section">
@@ -710,12 +716,12 @@ align -&gt; assert config core static_assert throw_exception
         directives.
       </p>
 <p>
-        HTML output is enabled by the <code class="literal">--html</code> option. The <code class="literal">--title</code>
-        and <code class="literal">--footer</code> options set the HTML <code class="literal">&lt;title&gt;</code>
+        HTML output is enabled by the <code class="literal">--html</code> option. The <code class="literal">--html-title</code>
+        and <code class="literal">--html-footer</code> options set the HTML <code class="literal">&lt;title&gt;</code>
         and the page footer and need to precede <code class="literal">--html</code>, like in
         the following example:
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Module Overview" --footer "Generated on 21.05.2015 20:53:11" --html --module-overview &gt; module-overview.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Module Overview" --html-footer "Generated on 21.05.2015 20:53:11" --html --module-overview &gt; module-overview.html
 </pre>
 </div>
 <div class="section">
@@ -730,7 +736,7 @@ align -&gt; assert config core static_assert throw_exception
         depend on other modules of level <code class="literal">N</code>. It takes the same
         options as <code class="literal">--module-overview</code>.
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Module Levels" --footer "Generated on 21.05.2015 20:53:11" --html --module-levels &gt; module-levels.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Module Levels" --html-footer "Generated on 21.05.2015 20:53:11" --html --module-levels &gt; module-levels.html
 </pre>
 </div>
 <div class="section">
@@ -745,7 +751,7 @@ align -&gt; assert config core static_assert throw_exception
 <p>
         <code class="literal">--module-weights</code> takes the same options as <code class="literal">--module-overview</code>.
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Module Weights" --footer "Generated on 21.05.2015 20:53:11" --html --module-weights &gt; module-weights.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Module Weights" --html-footer "Generated on 21.05.2015 20:53:11" --html --module-weights &gt; module-weights.html
 </pre>
 </div>
 <div class="section">
@@ -757,7 +763,7 @@ align -&gt; assert config core static_assert throw_exception
         primary (direct) dependencies of <span class="emphasis"><em>module</em></span>. It takes the
         same options as <code class="literal">--module-overview</code>.
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Primary Dependencies of filesystem" --footer "Generated on 21.05.2015 20:53:11" --html --primary filesystem &gt; filesystem-primary.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Primary Dependencies of filesystem" --html-footer "Generated on 21.05.2015 20:53:11" --html --primary filesystem &gt; filesystem-primary.html
 </pre>
 </div>
 <div class="section">
@@ -769,13 +775,13 @@ align -&gt; assert config core static_assert throw_exception
         the secondary (indirect) dependencies of <span class="emphasis"><em>module</em></span>. It
         takes the same options as <code class="literal">--module-overview</code>.
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Secondary Dependencies of filesystem" --footer "Generated on 21.05.2015 20:53:11" --html --secondary filesystem &gt; filesystem-secondary.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Secondary Dependencies of filesystem" --html-footer "Generated on 21.05.2015 20:53:11" --html --secondary filesystem &gt; filesystem-secondary.html
 </pre>
 <p>
         You can combine <code class="literal">--primary</code> and <code class="literal">--secondary</code>
         in one invocation.
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Dependencies of filesystem" --footer "Generated on 21.05.2015 20:53:11" --html --primary filesystem --secondary filesystem &gt; filesystem.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Dependencies of filesystem" --html-footer "Generated on 21.05.2015 20:53:11" --html --primary filesystem --secondary filesystem &gt; filesystem.html
 </pre>
 </div>
 <div class="section">
@@ -788,13 +794,13 @@ align -&gt; assert config core static_assert throw_exception
         modules depend on <span class="emphasis"><em>module</em></span>. It takes the same options
         as <code class="literal">--module-overview</code>.
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Reverse Dependencies of filesystem" --footer "Generated on 21.05.2015 20:53:11" --html --reverse filesystem &gt; filesystem-reverse.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Reverse Dependencies of filesystem" --html-footer "Generated on 21.05.2015 20:53:11" --html --reverse filesystem &gt; filesystem-reverse.html
 </pre>
 <p>
         You can combine <code class="literal">--reverse</code> with <code class="literal">--primary</code>
         and <code class="literal">--secondary</code> for a complete module report.
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Dependency Report for filesystem" --footer "Generated on 21.05.2015 20:53:11" --html --primary filesystem --secondary filesystem --reverse filesystem &gt; filesystem.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Dependency Report for filesystem" --html-footer "Generated on 21.05.2015 20:53:11" --html --primary filesystem --secondary filesystem --reverse filesystem &gt; filesystem.html
 </pre>
 </div>
 <div class="section">
@@ -817,7 +823,7 @@ align -&gt; assert config core static_assert throw_exception
 <p>
         <code class="literal">--subset</code> takes the same options as <code class="literal">--module-overview</code>.
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Subset Dependencies of filesystem" --footer "Generated on 21.05.2015 20:53:11" --html --subset filesystem &gt; filesystem-subset.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Subset Dependencies of filesystem" --html-footer "Generated on 21.05.2015 20:53:11" --html --subset filesystem &gt; filesystem-subset.html
 </pre>
 <p>
         You can combine <code class="literal">--subset</code> with the other module report
@@ -833,7 +839,7 @@ align -&gt; assert config core static_assert throw_exception
         an inclusion report for <span class="emphasis"><em>header</em></span>. It takes the same options
         as <code class="literal">--module-overview</code>.
       </p>
-<pre class="programlisting">dist/bin/boostdep --title "Inclusion Report for &lt;boost/shared_ptr.hpp&gt;" --footer "Generated on 21.05.2015 20:53:11" --html --header boost/shared_ptr.hpp &gt; header-boost-shared_ptr.html
+<pre class="programlisting">dist/bin/boostdep --html-title "Inclusion Report for &lt;boost/shared_ptr.hpp&gt;" --html-footer "Generated on 21.05.2015 20:53:11" --html --header boost/shared_ptr.hpp &gt; header-boost-shared_ptr.html
 </pre>
 </div>
 <div class="section">
@@ -862,6 +868,34 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.pkgconfig"></a><a class="link" href="index.html#boostdep.reference.pkgconfig" title="--pkgconfig">--pkgconfig</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">boostdep --pkgconfig <span class="emphasis"><em>module</em></span> <span class="emphasis"><em>version</em></span>
+        <span class="emphasis"><em>var</em></span>=<span class="emphasis"><em>value</em></span>...</code> outputs
+        a <code class="literal">pkg-config</code> <code class="literal">.pc</code> file for <span class="emphasis"><em>module</em></span>.
+      </p>
+<pre class="programlisting">dist/bin/boostdep --pkgconfig system 1.65.0 prefix=/usr/local includedir=${prefix}/include libdir=${prefix}/lib
+</pre>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.subset_for"></a><a class="link" href="index.html#boostdep.reference.subset_for" title="--subset-for">--subset-for</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">boostdep --subset-for <span class="emphasis"><em>directory</em></span></code> scans
+        <span class="emphasis"><em>directory</em></span> for <code class="computeroutput"><span class="preprocessor">#include</span></code>
+        directives and lists which Boost modules are reachable through these <code class="computeroutput"><span class="preprocessor">#include</span></code>s.
+      </p>
+<p>
+        Its use is in determining what subset of Boost is needed by a user application
+        or library.
+      </p>
+<pre class="programlisting">dist/bin/boostdep --subset-for d:\my_app
+</pre>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
 <a name="boostdep.reference.track_sources"></a><a class="link" href="index.html#boostdep.reference.track_sources" title="--track-sources">--track-sources</a>
 </h3></div></div></div>
 <p>
@@ -882,21 +916,41 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="boostdep.reference.title"></a><a class="link" href="index.html#boostdep.reference.title" title="--title">--title</a>
+<a name="boostdep.reference.html_title"></a><a class="link" href="index.html#boostdep.reference.html_title" title="--html-title">--html-title</a>
 </h3></div></div></div>
 <p>
-        <code class="literal">--title <span class="emphasis"><em>title</em></span></code> sets the contents of
-        the HTML <code class="literal">&lt;title&gt;</code> tag. It must precede <code class="literal">--html</code>
+        <code class="literal">--html-title <span class="emphasis"><em>title</em></span></code> sets the contents
+        of the HTML <code class="literal">&lt;title&gt;</code> tag. It must precede <code class="literal">--html</code>
         to have an effect.
       </p>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="boostdep.reference.footer"></a><a class="link" href="index.html#boostdep.reference.footer" title="--footer">--footer</a>
+<a name="boostdep.reference.html_footer"></a><a class="link" href="index.html#boostdep.reference.html_footer" title="--html-footer">--html-footer</a>
 </h3></div></div></div>
 <p>
-        <code class="literal">--footer <span class="emphasis"><em>footer</em></span></code> sets the page footer
-        text. It has no effect if <code class="literal">--html</code> is not given.
+        <code class="literal">--html-footer <span class="emphasis"><em>footer</em></span></code> sets the HTML
+        page footer text. It has no effect if <code class="literal">--html</code> is not given.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.html_stylesheet"></a><a class="link" href="index.html#boostdep.reference.html_stylesheet" title="--html-stylesheet">--html-stylesheet</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">--html-stylesheet <span class="emphasis"><em>stylesheet</em></span></code> sets
+        the HTML stylesheet URL. It has no effect if <code class="literal">--html</code> is
+        not given.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.html_prefix"></a><a class="link" href="index.html#boostdep.reference.html_prefix" title="--html-prefix">--html-prefix</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">--html-prefix <span class="emphasis"><em>prefix</em></span></code> sets the HTML
+        prefix; the prefix is output immediately after the <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">body</span><span class="special">&gt;</span></code>
+        tag. It has no effect if <code class="literal">--html</code> is not given.
       </p>
 </div>
 <div class="section">
@@ -911,7 +965,7 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: June 24, 2017 at 18:02:08 GMT</small></p></td>
+<td align="left"><p><small>Last revised: July 28, 2017 at 08:41:10 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
