@@ -101,6 +101,7 @@ def scan_module_dependencies( m, x, gm, deps, test ):
 
     if test:
         scan_directory( os.path.join( 'libs', m, 'test' ), x, gm, deps )
+        scan_directory( os.path.join( 'libs', m, 'example' ), x, gm, deps )
 
 def read_exceptions():
 
