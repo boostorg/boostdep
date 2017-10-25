@@ -200,8 +200,9 @@ if( __name__ == "__main__" ):
 
     dirs = [ 'include', 'src', 'test' ]
 
-    for dir in args.include:
-      dirs.append( dir )
+    if args.include:
+        for dir in args.include:
+          dirs.append( dir )
 
     # vprint( 'Directories:', dirs )
 
