@@ -25,6 +25,15 @@ config:
   boost/detail/workaround.hpp
   boost/limits.hpp
   boost/version.hpp
+container_hash:
+  boost/functional/hash.hpp
+  boost/functional/hash/detail/float_functions.hpp
+  boost/functional/hash/detail/hash_float.hpp
+  boost/functional/hash/detail/limits.hpp
+  boost/functional/hash/extensions.hpp
+  boost/functional/hash/hash.hpp
+  boost/functional/hash/hash_fwd.hpp
+  boost/functional/hash_fwd.hpp
 contract:
   boost/contract_macro.hpp
 conversion:
