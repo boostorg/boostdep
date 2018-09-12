@@ -254,7 +254,7 @@ Usage:
     \[options\]: \[--\[no-\]track-sources\] \[--\[no-\]track-tests\]
                \[--html-title <title>\] \[--html-footer <footer>\]
                \[--html-stylesheet <stylesheet>\] \[--html-prefix <prefix>\]
-               \[--html\]
+               \[--html\] \[--root <path-to-boost>\]
 ]
 
 [endsect]
@@ -698,6 +698,12 @@ Its use is in determining what subset of Boost is needed by a user application o
 [pre
 dist/bin/boostdep --subset-for d:\my_app
 ]
+
+[endsect]
+
+[section --root]
+
+[^--root /path-to-boost/] instructs /Boostdep/ to look for the boost root directory at /path-to-boost/ instead of the current one.
 
 [endsect]
 
