@@ -2348,9 +2348,22 @@ int main( int argc, char const* argv[] )
             "    [options]: [--[no-]track-sources] [--[no-]track-tests]\n"
             "               [--html-title <title>] [--html-footer <footer>]\n"
             "               [--html-stylesheet <stylesheet>] [--html-prefix <prefix>]\n"
-            "               [--html]\n";
+            "               [--html] [--root <path-to-boost>]\n";
 
         return -1;
+    }
+
+    for( int i = 0; i < argc; ++i )
+    {
+        if( std::strcmp(argv[i], "--root" ) == 0)
+        {
+            if( i + 1 >= argc )
+            {
+                std::cerr << "'" << argv[i] << "': missing argument.\n";
+                return -2;
+            }
+            fs::current_path( fs::path( argv[i + 1] ) );
+        }
     }
 
     if( !find_boost_root() )
@@ -2382,7 +2395,13 @@ int main( int argc, char const* argv[] )
     {
         std::string option = argv[ i ];
 
-        if( option == "--list-modules" )
+        if (option == "--root")
+        {
+            // we already dealt with this option at the start of the
+            // main function, so just skip it and the following argument
+            i++;
+        }
+        else if( option == "--list-modules" )
         {
             list_modules();
         }
