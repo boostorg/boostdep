@@ -34,6 +34,21 @@ matrix:
       compiler: clang++
       env: TOOLSET=clang CXXSTD=03,11,14,1z
 
+    - os: linux
+      compiler: g++
+      env: CMAKE=1
+      addons:
+        apt:
+          packages:
+            - libboost-filesystem-dev
+      install: true
+      script:
+        - set -e
+        - mkdir __build__
+        - cd __build__
+        - cmake ..
+        - cmake --build .
+
 install:
   - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
   - cd ..
