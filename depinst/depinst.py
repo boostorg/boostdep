@@ -136,7 +136,7 @@ def read_gitmodules():
         for line in f:
 
             line = line.strip()
-            
+
             m = re.match( 'path[ \t]*=[ \t]*(.*)$', line )
 
             if m:
@@ -145,24 +145,38 @@ def read_gitmodules():
                 
     return gm
 
-def install_modules( deps, x, gm ):
+def install_modules( deps, x, gm, git_args ):
 
-    r = 0
+    modules = []
 
     for m, i in deps.items():
 
         if not i:
 
-            print 'Installing module', m
-            os.system( 'git submodule -q update --init libs/' + m )
-
-            r += 1
+            modules += [ m ]
 
             deps[ m ] = 1 # mark as installed
 
-            scan_module_dependencies( m, x, gm, deps, [ 'include', 'src' ] )
 
-    return r
+    if len( modules ) == 0:
+
+        return 0
+
+
+    print 'Installing modules: ', ', '.join(modules)
+
+    command = 'git submodule -q update --init ' + git_args + ' libs/' + ' libs/'.join( modules )
+
+    #print command
+
+    os.system( command );
+
+    for m in modules:
+
+        scan_module_dependencies( m, x, gm, deps, [ 'include', 'src' ] )
+
+    return len( modules )
+
 
 if( __name__ == "__main__" ):
 
@@ -170,6 +184,7 @@ if( __name__ == "__main__" ):
 
     parser.add_argument( '-v', '--verbose', help='enable verbose output', action='store_true' )
     parser.add_argument( '-I', '--include', help="additional subdirectory to scan; defaults are 'include', 'src', 'test'; can be repeated", metavar='DIR', action='append' )
+    parser.add_argument( '-g', '--git_args', help="additional arguments to `git submodule update`", default='', action='store' )
     parser.add_argument( 'library', help="name of library to scan ('libs/' will be prepended)" )
 
     args = parser.parse_args()
@@ -210,5 +225,5 @@ if( __name__ == "__main__" ):
 
     # vprint( 'Dependencies:', deps )
 
-    while install_modules( deps, x, gm ):
+    while install_modules( deps, x, gm, args.git_args ):
         pass

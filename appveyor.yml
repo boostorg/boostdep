@@ -1,4 +1,4 @@
-# Copyright 2016, 2017 Peter Dimov
+# Copyright 2016-2018 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -13,8 +13,10 @@ branches:
     - /feature\/.*/
 
 install:
+  - set BOOST_BRANCH=develop
+  - if "%APPVEYOR_REPO_BRANCH%" == "master" set BOOST_BRANCH=master
   - cd ..
-  - git clone -b %APPVEYOR_REPO_BRANCH% https://github.com/boostorg/boost.git boost-root
+  - git clone -b %BOOST_BRANCH% https://github.com/boostorg/boost.git boost-root
   - cd boost-root
   - git submodule update --init tools/build
   - git submodule update --init libs/config
@@ -26,4 +28,4 @@ install:
 build: off
 
 test_script:
-  - b2 tools/boostdep/test toolset=msvc-9.0,msvc-10.0,msvc-11.0,msvc-14.0
+  - b2 -j3 tools/boostdep/test toolset=msvc-9.0,msvc-10.0,msvc-11.0,msvc-14.0
