@@ -44,10 +44,10 @@ matrix:
       install: true
       script:
         - set -e
-        - mkdir __build__
-        - cd __build__
+        - mkdir __build__ && cd __build__
         - cmake ..
-        - cmake --build .
+        - cmake --build . --target install
+        - boostdep
 
 install:
   - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
