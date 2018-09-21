@@ -184,7 +184,7 @@ if( __name__ == "__main__" ):
 
     parser.add_argument( '-v', '--verbose', help='enable verbose output', action='store_true' )
     parser.add_argument( '-I', '--include', help="additional subdirectory to scan; defaults are 'include', 'src', 'test'; can be repeated", metavar='DIR', action='append' )
-    parser.add_argument( '-g', '--git_args', help="additional git arguments", default='', action='store' )
+    parser.add_argument( '-g', '--git_args', help="additional arguments to `git submodule update`", default='', action='store' )
     parser.add_argument( 'library', help="name of library to scan ('libs/' will be prepended)" )
 
     args = parser.parse_args()
