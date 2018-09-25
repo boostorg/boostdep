@@ -66,6 +66,7 @@
 <dt><span class="section"><a href="index.html#boostdep.reference.cmake">--cmake</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.pkgconfig">--pkgconfig</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.subset_for">--subset-for</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.boost_root">--boost-root</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_sources">--track-sources</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_tests">--track-tests</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html_title">--html-title</a></span></dt>
@@ -339,7 +340,8 @@ nothing added to commit but untracked files present (use "git add" to track)
     boostdep --pkgconfig &lt;module&gt; &lt;version&gt; [&lt;var&gt;=&lt;value&gt;] [&lt;var&gt;=&lt;value&gt;]...
     boostdep [options] --subset-for &lt;directory&gt;
 
-    [options]: [--[no-]track-sources] [--[no-]track-tests]
+    [options]: [--boost-root &lt;path-to-boost&gt;]
+               [--[no-]track-sources] [--[no-]track-tests]
                [--html-title &lt;title&gt;] [--html-footer &lt;footer&gt;]
                [--html-stylesheet &lt;stylesheet&gt;] [--html-prefix &lt;prefix&gt;]
                [--html]
@@ -599,6 +601,7 @@ FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --html-title "Dependency
 <dt><span class="section"><a href="index.html#boostdep.reference.cmake">--cmake</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.pkgconfig">--pkgconfig</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.subset_for">--subset-for</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.boost_root">--boost-root</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_sources">--track-sources</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.track_tests">--track-tests</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html_title">--html-title</a></span></dt>
@@ -896,6 +899,20 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.boost_root"></a><a class="link" href="index.html#boostdep.reference.boost_root" title="--boost-root">--boost-root</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">--boost-root <span class="emphasis"><em>path-to-boost</em></span></code> instructs
+        <span class="emphasis"><em>Boostdep</em></span> to look for the Boost root directory at <span class="emphasis"><em>path-to-boost</em></span>.
+        If this option is not given, the current directory and its parents are searched
+        for the presence of a file named <code class="literal">Jamroot</code>. If one is found,
+        that directory is assumed to be the root. If not, the environment variable
+        <code class="literal">BOOST_ROOT</code> is assumed to contain the path to the Boost
+        root.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
 <a name="boostdep.reference.track_sources"></a><a class="link" href="index.html#boostdep.reference.track_sources" title="--track-sources">--track-sources</a>
 </h3></div></div></div>
 <p>
@@ -965,7 +982,7 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: July 28, 2017 at 08:41:10 GMT</small></p></td>
+<td align="left"><p><small>Last revised: September 25, 2018 at 22:52:47 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>

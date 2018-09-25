@@ -704,7 +704,10 @@ dist/bin/boostdep --subset-for d:\my_app
 
 [section --boost-root]
 
-[^--boost-root /path-to-boost/] instructs /Boostdep/ to look for the Boost root directory at /path-to-boost/ instead of the current one.
+[^--boost-root /path-to-boost/] instructs /Boostdep/ to look for the Boost root directory at /path-to-boost/. If this option
+is not given, the current directory and its parents are searched for the presence of a file named =Jamroot=. If one is found,
+that directory is assumed to be the root. If not, the environment variable =BOOST_ROOT= is assumed to contain the path to the
+Boost root.
 
 [endsect]
 
