@@ -2338,14 +2338,14 @@ static fs::path search_boost_root_in_arguments( int argc, char const* argv[] )
     // --boost-root is last argument
     if( opt_pos + 1 == argc )
     {
-        throw std::runtime_error( "Missing argument for option --boost-root " );
+        throw std::runtime_error( "    Missing argument for option \"--boost-root\"" );
     }
 
     const fs::path specified_root_path = fs::path( argv[opt_pos + 1] );
     if( !is_boost_root( specified_root_path ) )
     {
-        throw std::runtime_error( "Could not find \"Jamroot\" in directory specified via \"--boost-root\": \n\""
-                                  + specified_root_path.string() + "\"" );
+        throw std::runtime_error( "    Could not find \"Jamroot\" in directory specified via \"--boost-root\":\n"
+                                  "    \""+ specified_root_path.string() + "\"" );
     }
     return specified_root_path;
 }
@@ -2361,7 +2361,7 @@ static fs::path search_boost_root_in_env()
     const fs::path root_dir( boost_root_env_str );
     if( !is_boost_root( root_dir ) )
     {
-        throw std::runtime_error( "Invalid value in BOOST_ROOT: \"" + std::string( boost_root_env_str ) + "\"" );
+        throw std::runtime_error( "    Invalid value in environment variable BOOST_ROOT: \"" + std::string( boost_root_env_str ) + "\"" );
     }
 
     return root_dir;
@@ -2383,9 +2383,11 @@ static fs::path find_boost_root( int argc, char const* argv[] )
 
     if( root.empty() ) {
         throw std::runtime_error(
-            "\"Jamroot\" not in parents of current path and no environment variable BOOST_ROOT found."
-            "\nCurrent path: (" + fs::current_path().string() + ")"
-            "\nUse \"--boost-root\" to specify root directory manually ");
+            "    File \"Jamroot\" not found in parents of current folder\n"
+            "    and no environment variable BOOST_ROOT found.\n"
+            "    Current folder: \"" + fs::current_path().string() + "\"\n"
+            "\n"
+            "    Use \"--boost-root <path-to-boost>\" to specify root directory manually.");
     }
 
     return root;
@@ -2431,12 +2433,12 @@ int main( int argc, char const* argv[] )
     try
     {
         const fs::path boost_root = find_boost_root( argc, argv );
-        std::cout << "Used boost root directory: \"" << fs::canonical( boost_root ) << "\"" << std::endl;
+        std::cout << "Analyzing boost directory: " << fs::canonical( boost_root ) << std::endl;
         fs::current_path( boost_root );
     }
     catch( std::exception& e )
     {
-        std::cerr << "Could not find boost root directory:\n" << e.what() << std::endl;
+        std::cerr << "Could not find boost root directory:\n\n" << e.what() << "\n" << std::endl;
         return -2;
     }
 
