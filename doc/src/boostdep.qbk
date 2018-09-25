@@ -251,10 +251,11 @@ Usage:
     boostdep --pkgconfig <module> <version> \[<var>=<value>\] \[<var>=<value>\]...
     boostdep \[options\] --subset-for <directory>
 
-    \[options\]: \[--\[no-\]track-sources\] \[--\[no-\]track-tests\]
+    \[options\]: \[--boost-root <path-to-boost>\]
+               \[--\[no-\]track-sources\] \[--\[no-\]track-tests\]
                \[--html-title <title>\] \[--html-footer <footer>\]
                \[--html-stylesheet <stylesheet>\] \[--html-prefix <prefix>\]
-               \[--html\] \[--root <path-to-boost>\]
+               \[--html\]
 ]
 
 [endsect]
@@ -701,9 +702,9 @@ dist/bin/boostdep --subset-for d:\my_app
 
 [endsect]
 
-[section --root]
+[section --boost-root]
 
-[^--root /path-to-boost/] instructs /Boostdep/ to look for the boost root directory at /path-to-boost/ instead of the current one.
+[^--boost-root /path-to-boost/] instructs /Boostdep/ to look for the Boost root directory at /path-to-boost/ instead of the current one.
 
 [endsect]
 

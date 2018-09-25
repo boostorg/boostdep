@@ -18,6 +18,7 @@
 #include <set>
 #include <algorithm>
 #include <climits>
+#include <cstdlib>
 
 namespace fs = boost::filesystem;
 
@@ -2317,6 +2318,11 @@ static bool find_boost_root()
     return false;
 }
 
+static bool is_boost_root( fs::path const & p )
+{
+    return fs::exists( p / "Jamroot" );
+}
+
 int main( int argc, char const* argv[] )
 {
     if( argc < 2 )
@@ -2345,31 +2351,59 @@ int main( int argc, char const* argv[] )
             "    boostdep --pkgconfig <module> <version> [<var>=<value>] [<var>=<value>]...\n"
             "    boostdep [options] --subset-for <directory>\n"
             "\n"
-            "    [options]: [--[no-]track-sources] [--[no-]track-tests]\n"
+            "    [options]: [--boost-root <path-to-boost>]\n"
+            "               [--[no-]track-sources] [--[no-]track-tests]\n"
             "               [--html-title <title>] [--html-footer <footer>]\n"
             "               [--html-stylesheet <stylesheet>] [--html-prefix <prefix>]\n"
-            "               [--html] [--root <path-to-boost>]\n";
+            "               [--html]\n";
 
         return -1;
     }
 
+    bool root_set = false;
+
     for( int i = 0; i < argc; ++i )
     {
-        if( std::strcmp(argv[i], "--root" ) == 0)
+        std::string option = argv[ i ];
+
+        if( option == "--boost-root" )
         {
-            if( i + 1 >= argc )
+            if( i + 1 < argc )
             {
-                std::cerr << "'" << argv[i] << "': missing argument.\n";
+                fs::path p( argv[ ++i ] );
+
+                if( is_boost_root( p ) )
+                {
+                    fs::current_path( p );
+                    root_set = true;
+                }
+                else
+                {
+                    std::cerr << "'" << p.string() << "': not a valid Boost root.\n";
+                    return -2;
+                }
+            }
+            else
+            {
+                std::cerr << "'" << option << "': missing argument.\n";
                 return -2;
             }
-            fs::current_path( fs::path( argv[i + 1] ) );
         }
     }
 
-    if( !find_boost_root() )
+    if( !root_set && !find_boost_root() )
     {
-        std::cerr << "boostdep: Could not find Boost root.\n";
-        return -2;
+        char const * env_root = std::getenv( "BOOST_ROOT" );
+
+        if( env_root && is_boost_root( env_root ) )
+        {
+            fs::current_path( env_root );
+        }
+        else
+        {
+            std::cerr << "boostdep: Could not find Boost root.\n";
+            return -2;
+        }
     }
 
     try
@@ -2395,11 +2429,9 @@ int main( int argc, char const* argv[] )
     {
         std::string option = argv[ i ];
 
-        if (option == "--root")
+        if( option == "--boost-root" )
         {
-            // we already dealt with this option at the start of the
-            // main function, so just skip it and the following argument
-            i++;
+            ++i;
         }
         else if( option == "--list-modules" )
         {
