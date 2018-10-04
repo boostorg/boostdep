@@ -2295,6 +2295,87 @@ static void output_directory_subset_report( std::string const & module, std::set
     }
 }
 
+// list_buildable_dependencies
+
+struct list_buildable_dependencies_actions: public module_overview_actions
+{
+    std::set< std::string > buildable_;
+
+    std::set< std::string > deps_;
+    bool headers_;
+
+    list_buildable_dependencies_actions(): headers_()
+    {
+    }
+
+    void begin()
+    {
+        std::cout << "# Generated file. Do not edit.\n\n";
+    }
+
+    void end()
+    {
+    }
+
+    void module_start( std::string const & module )
+    {
+        deps_.clear();
+        headers_ = false;
+
+        if( buildable_.count( module ) )
+        {
+            std::cout << module << " =";
+        }
+    }
+
+    void module_end( std::string const & module )
+    {
+        if( buildable_.count( module ) )
+        {
+            if( headers_ )
+            {
+                std::cout << " headers";
+            }
+
+            for( std::set< std::string >::iterator i = deps_.begin(); i != deps_.end(); ++i )
+            {
+                std::cout << " " << *i;
+            }
+
+            std::cout << " ;\n";
+        }
+    }
+
+    void module2( std::string const & module )
+    {
+        if( module == "(unknown)" ) return;
+
+        if( buildable_.count( module ) == 0 )
+        {
+            headers_ = true;
+        }
+        else
+        {
+            deps_.insert( module );
+        }
+    }
+};
+
+static void list_buildable_dependencies()
+{
+    list_buildable_dependencies_actions actions;
+
+    for( std::set< std::string >::iterator i = s_modules.begin(); i != s_modules.end(); ++i )
+    {
+        if( fs::exists( module_build_path( *i ) ) && fs::exists( module_source_path( *i ) ) )
+        {
+            actions.buildable_.insert( *i );
+        }
+    }
+
+    output_module_overview_report( actions );
+}
+
 //
 
 static bool find_boost_root()
@@ -2337,6 +2418,7 @@ int main( int argc, char const* argv[] )
             "    boostdep [--track-sources] [--track-tests] --list-dependencies\n"
             "    boostdep --list-exceptions\n"
             "    boostdep --list-missing-headers\n"
+            "    boostdep --list-buildable-dependencies\n"
             "\n"
             "    boostdep [options] --module-overview\n"
             "    boostdep [options] --module-levels\n"
@@ -2612,6 +2694,11 @@ int main( int argc, char const* argv[] )
             }
 
             break;
+        }
+        else if( option == "--list-buildable-dependencies" )
+        {
+            enable_secondary( secondary, true, false );
+            list_buildable_dependencies();
         }
         else if( s_modules.count( option ) )
         {
