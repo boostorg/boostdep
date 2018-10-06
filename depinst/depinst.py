@@ -81,7 +81,10 @@ def scan_directory( d, x, gm, deps ):
 
     vprint( 'Scanning directory', d )
 
-    for root, dirs, files in os.walk( unicode( d ) ):
+    if os.name == 'nt':
+        d = unicode( d )
+
+    for root, dirs, files in os.walk( d ):
 
         for file in files:
 
