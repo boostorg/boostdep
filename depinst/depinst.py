@@ -81,7 +81,7 @@ def scan_directory( d, x, gm, deps ):
 
     vprint( 'Scanning directory', d )
 
-    for root, dirs, files in os.walk( d ):
+    for root, dirs, files in os.walk( unicode( d ) ):
 
         for file in files:
 
