@@ -47,6 +47,22 @@ matrix:
         - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~ ..
         - cmake --build . --target install
 
+    - os: linux
+      compiler: g++
+      env: CHECK_EXCEPTIONS=1
+      install:
+        - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
+        - cd ..
+        - git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+        - cd boost-root
+        - git submodule update --init
+        - cp -r $TRAVIS_BUILD_DIR/* tools/boostdep
+        - python tools/boostdep/depinst/depinst.py ../tools/boostdep
+        - ./bootstrap.sh
+        - ./b2 tools/boostdep/build
+      script:
+        - dist/bin/boostdep --list-exceptions | diff -u tools/boostdep/depinst/exceptions.txt -
+
 install:
   - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
   - cd ..
