@@ -236,6 +236,7 @@ Usage:
     boostdep \[--track-sources\] \[--track-tests\] --list-dependencies
     boostdep --list-exceptions
     boostdep --list-missing-headers
+    boostdep --list-buildable-dependencies
 
     boostdep \[options\] --module-overview
     boostdep \[options\] --module-levels
@@ -530,6 +531,19 @@ the include directory ot their corresponding module.
 [section --list-missing-headers]
 =boostdep --list-missing-headers= prints a list of the headers that are included by
 another header, but are missing.
+
+[endsect]
+
+[section --list-buildable-dependencies]
+=boostdep --list-buildable-dependencies= prints a list of the dependencies of the buildable
+libraries, in the form
+
+[pre
+module = dependency1 dependency2 /.../ ;
+]
+
+This is valid Boost.Build syntax, so the output can be used as a Boost.Build module. All
+header-only libraries are considered one library named =headers=.
 
 [endsect]
 

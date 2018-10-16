@@ -54,6 +54,7 @@
 <dt><span class="section"><a href="index.html#boostdep.reference.list_dependencies">--list-dependencies</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.list_exceptions">--list-exceptions</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.list_missing_headers">--list-missing-headers</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.list_buildable_dependencies">--list-buildable-dependencies</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_overview">--module-overview</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_levels">--module-levels</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_weights">--module-weights</a></span></dt>
@@ -325,6 +326,7 @@ nothing added to commit but untracked files present (use "git add" to track)
     boostdep [--track-sources] [--track-tests] --list-dependencies
     boostdep --list-exceptions
     boostdep --list-missing-headers
+    boostdep --list-buildable-dependencies
 
     boostdep [options] --module-overview
     boostdep [options] --module-levels
@@ -589,6 +591,7 @@ FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --html-title "Dependency
 <dt><span class="section"><a href="index.html#boostdep.reference.list_dependencies">--list-dependencies</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.list_exceptions">--list-exceptions</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.list_missing_headers">--list-missing-headers</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.list_buildable_dependencies">--list-buildable-dependencies</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_overview">--module-overview</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_levels">--module-levels</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.module_weights">--module-weights</a></span></dt>
@@ -678,6 +681,21 @@ FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --html-title "Dependency
 <p>
         <code class="literal">boostdep --list-missing-headers</code> prints a list of the headers
         that are included by another header, but are missing.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.list_buildable_dependencies"></a><a class="link" href="index.html#boostdep.reference.list_buildable_dependencies" title="--list-buildable-dependencies">--list-buildable-dependencies</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">boostdep --list-buildable-dependencies</code> prints a list of
+        the dependencies of the buildable libraries, in the form
+      </p>
+<pre class="programlisting">module = dependency1 dependency2 <span class="emphasis"><em>...</em></span> ;
+</pre>
+<p>
+        This is valid Boost.Build syntax, so the output can be used as a Boost.Build
+        module. All header-only libraries are considered one library named <code class="literal">headers</code>.
       </p>
 </div>
 <div class="section">
@@ -982,7 +1000,7 @@ align -&gt; assert config core static_assert throw_exception
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: September 25, 2018 at 22:52:47 GMT</small></p></td>
+<td align="left"><p><small>Last revised: October 16, 2018 at 01:13:33 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
