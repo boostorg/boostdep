@@ -27,9 +27,6 @@ config:
   boost/version.hpp
 container_hash:
   boost/functional/hash.hpp
-  boost/functional/hash/detail/float_functions.hpp
-  boost/functional/hash/detail/hash_float.hpp
-  boost/functional/hash/detail/limits.hpp
   boost/functional/hash/extensions.hpp
   boost/functional/hash/hash.hpp
   boost/functional/hash/hash_fwd.hpp
@@ -90,6 +87,7 @@ graph:
   boost/pending/mutable_heap.hpp
   boost/pending/mutable_queue.hpp
   boost/pending/property.hpp
+  boost/pending/property_serialize.hpp
   boost/pending/queue.hpp
   boost/pending/relaxed_heap.hpp
   boost/pending/stringtok.hpp
@@ -149,7 +147,6 @@ graph_parallel:
   boost/graph/parallel/process_group.hpp
   boost/graph/parallel/properties.hpp
   boost/graph/parallel/simple_trigger.hpp
-  boost/pending/property_serialize.hpp
 integer:
   boost/integer_fwd.hpp
   boost/integer_traits.hpp
@@ -181,6 +178,10 @@ numeric/conversion:
 optional:
   boost/none.hpp
   boost/none_t.hpp
+parameter_python:
+  boost/parameter/aux_/python/invoker.hpp
+  boost/parameter/aux_/python/invoker_iterate.hpp
+  boost/parameter/python.hpp
 predef:
   boost/detail/endian.hpp
   boost/predef.h
@@ -299,9 +300,6 @@ serialization:
   boost/archive/xml_oarchive.hpp
   boost/archive/xml_wiarchive.hpp
   boost/archive/xml_woarchive.hpp
-signals:
-  boost/last_value.hpp
-  boost/signal.hpp
 smart_ptr:
   boost/detail/atomic_count.hpp
   boost/detail/lightweight_mutex.hpp
