@@ -71,7 +71,7 @@ install:
   - git submodule update --init tools/build
   - git submodule update --init libs/config
   - cp -r $TRAVIS_BUILD_DIR/* tools/boostdep
-  - unzip tools/boostdep/test/utf8-test.zip -d tools/boostdep/test
+  - pushd tools/boostdep/test && { cmake -E tar xf utf8-test.zip; popd }
   - ls -l tools/boostdep/test
   - python tools/boostdep/depinst/depinst.py ../tools/boostdep
   - ./bootstrap.sh
