@@ -66,9 +66,7 @@ disjoint_sets:
   boost/pending/detail/disjoint_sets.hpp
   boost/pending/disjoint_sets.hpp
 dynamic_bitset:
-  boost/detail/dynamic_bitset.hpp
   boost/dynamic_bitset_fwd.hpp
-  boost/pending/lowest_bit.hpp
 exception:
   boost/exception_ptr.hpp
 foreach:
