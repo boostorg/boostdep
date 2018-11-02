@@ -32,6 +32,9 @@ install:
   - cd boost-root
   - git submodule update --init tools/build
   - git submodule update --init libs/config
+  - git submodule update --init libs/assert
+  - git submodule update --init libs/bind
+  - git submodule update --init libs/core
   - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\boostdep\
   - pushd tools\boostdep\test && cmake -E tar xf utf8-test.zip & popd
   - dir tools\boostdep\test
