@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <climits>
 #include <cstdlib>
+#include <streambuf>
+#include <sstream>
 
 namespace fs = boost::filesystem;
 
@@ -2405,6 +2407,62 @@ static bool is_boost_root( fs::path const & p )
     return fs::exists( p / "Jamroot" );
 }
 
+// teebuf
+
+class teebuf: public std::streambuf
+{
+private:
+
+    std::streambuf * sb1_;
+    std::streambuf * sb2_;
+
+public:
+
+    teebuf( std::streambuf * sb1, std::streambuf * sb2 ): sb1_( sb1 ), sb2_( sb2 )
+    {
+    }
+
+private:
+
+    virtual int overflow( int c )
+    {
+        int r1 = sb1_->sputc( c );
+        int r2 = sb2_->sputc( c );
+
+        return r1 == EOF || r2 == EOF? EOF : c;
+    }
+
+    virtual int sync()
+    {
+        int r1 = sb1_->pubsync();
+        int r2 = sb2_->pubsync();
+
+        return r1 == 0 && r2 == 0? 0 : -1;
+    }
+};
+
+// save_cout_rdbuf
+
+class save_cout_rdbuf
+{
+private:
+
+    std::streambuf * sb_;
+
+public:
+
+    save_cout_rdbuf(): sb_( std::cout.rdbuf() )
+    {
+    }
+
+    ~save_cout_rdbuf()
+    {
+        std::cout.rdbuf( sb_ );
+    }
+};
+
+// main
+
 int main( int argc, char const* argv[] )
 {
     if( argc < 2 )
@@ -2495,7 +2553,7 @@ int main( int argc, char const* argv[] )
     }
     catch( fs::filesystem_error const & x )
     {
-        std::cout << x.what() << std::endl;
+        std::cerr << x.what() << std::endl;
     }
 
     bool html = false;
@@ -2507,6 +2565,11 @@ int main( int argc, char const* argv[] )
     std::string html_footer;
     std::string html_stylesheet;
     std::string html_prefix;
+
+    std::ostringstream captured_output;
+    teebuf tsb( std::cout.rdbuf(), captured_output.rdbuf() );
+
+    save_cout_rdbuf scrdb;
 
     for( int i = 1; i < argc; ++i )
     {
@@ -2699,6 +2762,41 @@ int main( int argc, char const* argv[] )
         {
             enable_secondary( secondary, true, false );
             list_buildable_dependencies();
+        }
+        else if( option == "--capture-output" )
+        {
+            std::cout.rdbuf( &tsb );
+        }
+        else if( option == "--compare-output" )
+        {
+            if( i + 1 < argc )
+            {
+                std::string fn = argv[ ++i ];
+                std::fstream is( fn.c_str() );
+
+                if( !is )
+                {
+                    std::cerr << option << " '" << fn << "': could not open file.\n";
+                    return 1;
+                }
+
+                std::istreambuf_iterator<char> first( is ), last;
+                std::string fc( first, last );
+
+                if( fc != captured_output.str() )
+                {
+                    std::cerr << option << " '" << fn << "': output does not match; expected output:\n---\n" << fc << "---\n";
+                    return 1;
+                }
+
+                std::cerr << option << " '" << fn << "': output matches.\n";
+                captured_output.str( "" );
+            }
+            else
+            {
+                std::cerr << "'" << option << "': missing argument.\n";
+                return 1;
+            }
         }
         else if( s_modules.count( option ) )
         {
