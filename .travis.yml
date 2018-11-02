@@ -151,9 +151,7 @@ install:
 script:
   - |-
     echo "using $TOOLSET : : $TRAVIS_COMPILER ;" > ~/user-config.jam
-  - ./b2 -j3 tools/boostdep/build toolset=$TOOLSET cxxstd=$CXXSTD
-  - dist/bin/boostdep assert | diff -u tools/boostdep/test/assert-primary.txt -
-  - dist/bin/boostdep --secondary bind | diff -u tools/boostdep/test/bind-secondary.txt -
+  - ./b2 -j3 tools/boostdep/test toolset=$TOOLSET cxxstd=$CXXSTD
 
 notifications:
   email:
