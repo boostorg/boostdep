@@ -24,10 +24,12 @@
 #ifdef BOOSTDEP_USE_STD_FS
     #include <filesystem>
     namespace fs = std::filesystem;
+    typedef std::ifstream ifstream_t;
 #else
     #include <boost/filesystem.hpp>
     #include <boost/filesystem/fstream.hpp>
     namespace fs = boost::filesystem;
+    typedef fs::ifstream ifstream_t;
 #endif
 
 
@@ -230,11 +232,7 @@ static void scan_module_path( fs::path const & dir, bool remove_prefix, std::map
                 header = header.substr( n+1 );
             }
 
-#ifdef BOOSTDEP_USE_STD_FS
-            std::ifstream is( it->path() );
-#else
-            fs::ifstream is( it->path() );
-#endif
+            ifstream_t is( it->path() );
 
             scan_header_dependencies( header, is, deps, from );
         }
