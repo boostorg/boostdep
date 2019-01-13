@@ -3,7 +3,7 @@
 # depinst.py - installs the dependencies needed to test
 #              a Boost library
 #
-# Copyright 2016 Peter Dimov
+# Copyright 2016-2019 Peter Dimov
 #
 # Distributed under the Boost Software License, Version 1.0.
 # See accompanying file LICENSE_1_0.txt or copy at
@@ -104,7 +104,7 @@ def scan_directory( d, x, gm, deps ):
 
             fn = os.path.join( root, file )
 
-            vprint( 1, 'Scanning file', fn )
+            vprint( 2, 'Scanning file', fn )
 
             with open( fn, 'r' ) as f:
 
@@ -217,7 +217,8 @@ if( __name__ == "__main__" ):
 
     parser.add_argument( '-v', '--verbose', help='enable verbose output', action='count', default=0 )
     parser.add_argument( '-q', '--quiet', help='quiet output (opposite of -v)', action='count', default=0 )
-    parser.add_argument( '-I', '--include', help="additional subdirectory to scan; defaults are 'include', 'src', 'test'; can be repeated", metavar='DIR', action='append', default=[] )
+    parser.add_argument( '-X', '--exclude', help="exclude a default subdirectory ('include', 'src', or 'test') from scan; can be repeated", metavar='DIR', action='append', default=[] )
+    parser.add_argument( '-I', '--include', help="additional subdirectory to scan; can be repeated", metavar='DIR', action='append', default=[] )
     parser.add_argument( '-g', '--git_args', help="additional arguments to `git submodule update`", default='', action='store' )
     parser.add_argument( 'library', help="name of library to scan ('libs/' will be prepended)" )
 
@@ -225,6 +226,7 @@ if( __name__ == "__main__" ):
 
     verbose = args.verbose - args.quiet
 
+    vprint( 2, '-X:', args.exclude )
     vprint( 2, '-I:', args.include )
 
     x = read_exceptions()
@@ -245,10 +247,13 @@ if( __name__ == "__main__" ):
 
     dirs = [ 'include', 'src', 'test' ]
 
+    for dir in args.exclude:
+      dirs.remove( dir )
+
     for dir in args.include:
       dirs.append( dir )
 
-    vprint( 2, 'Directories:', dirs )
+    vprint( 1, 'Directories to scan:', *dirs )
 
     scan_module_dependencies( m, x, gm, deps, dirs )
 
