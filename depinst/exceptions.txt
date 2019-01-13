@@ -176,6 +176,8 @@ numeric/conversion:
 optional:
   boost/none.hpp
   boost/none_t.hpp
+outcome:
+  boost/outcome.ixx
 parameter_python:
   boost/parameter/aux_/python/invoker.hpp
   boost/parameter/aux_/python/invoker_iterate.hpp
