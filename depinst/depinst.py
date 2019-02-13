@@ -71,7 +71,7 @@ def module_for_header( h, x, gm ):
         return None
 
 
-def scan_header_dependencies( f, x, gm, deps ):
+def scan_header_dependencies( f, x, gm, deps, blocked ):
 
     for line in f:
 
@@ -85,13 +85,13 @@ def scan_header_dependencies( f, x, gm, deps ):
 
             if mod:
 
-                if not mod in deps:
+                if mod not in deps and mod not in blocked:
 
                     vprint( 1, 'Adding dependency', mod )
                     deps[ mod ] = 0
 
 
-def scan_directory( d, x, gm, deps ):
+def scan_directory( d, x, gm, deps, blocked ):
 
     vprint( 1, 'Scanning directory', d )
 
@@ -108,15 +108,15 @@ def scan_directory( d, x, gm, deps ):
 
             with open( fn, 'r' ) as f:
 
-                scan_header_dependencies( f, x, gm, deps )
+                scan_header_dependencies( f, x, gm, deps, blocked )
 
 
-def scan_module_dependencies( m, x, gm, deps, dirs ):
+def scan_module_dependencies( m, x, gm, deps, dirs, blocked = [] ):
 
     vprint( 1, 'Scanning module', m )
 
     for dir in dirs:
-        scan_directory( os.path.join( 'libs', m, dir ), x, gm, deps )
+        scan_directory( os.path.join( 'libs', m, dir ), x, gm, deps, blocked )
 
 
 def read_exceptions():
@@ -218,6 +218,7 @@ if( __name__ == "__main__" ):
     parser.add_argument( '-v', '--verbose', help='enable verbose output', action='count', default=0 )
     parser.add_argument( '-q', '--quiet', help='quiet output (opposite of -v)', action='count', default=0 )
     parser.add_argument( '-X', '--exclude', help="exclude a default subdirectory ('include', 'src', or 'test') from scan; can be repeated", metavar='DIR', action='append', default=[] )
+    parser.add_argument( '-B', '--block', help="exclude dependency even when found in scan; can be repeated", metavar='LIB', action='append', default=[] )
     parser.add_argument( '-I', '--include', help="additional subdirectory to scan; can be repeated", metavar='DIR', action='append', default=[] )
     parser.add_argument( '-g', '--git_args', help="additional arguments to `git submodule update`", default='', action='store' )
     parser.add_argument( 'library', help="name of library to scan ('libs/' will be prepended)" )
@@ -228,6 +229,7 @@ if( __name__ == "__main__" ):
 
     vprint( 2, '-X:', args.exclude )
     vprint( 2, '-I:', args.include )
+    vprint( 2, '-B:', args.block )
 
     x = read_exceptions()
     vprint( 2, 'Exceptions:', x )
@@ -255,7 +257,7 @@ if( __name__ == "__main__" ):
 
     vprint( 1, 'Directories to scan:', *dirs )
 
-    scan_module_dependencies( m, x, gm, deps, dirs )
+    scan_module_dependencies( m, x, gm, deps, dirs, args.block )
 
     vprint( 2, 'Dependencies:', deps )
 
