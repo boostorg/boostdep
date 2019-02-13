@@ -131,6 +131,21 @@ matrix:
       script:
         - dist/bin/boostdep --list-exceptions | diff -u tools/boostdep/depinst/exceptions.txt -
 
+    - os: linux
+      compiler: g++
+      env: PYTHON3=1
+      install:
+        - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
+        - cd ..
+        - git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+        - cd boost-root
+        - git submodule update --init tools/build
+        - cp -r $TRAVIS_BUILD_DIR/* tools/boostdep
+        - ./bootstrap.sh
+      script:
+        - python3 tools/boostdep/depinst/depinst.py ../tools/boostdep
+        - ./b2 tools/boostdep/build
+
 install:
   - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
   - cd ..
