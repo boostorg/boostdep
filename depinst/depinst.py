@@ -105,9 +105,15 @@ def scan_directory( d, x, gm, deps ):
 
             vprint( 2, 'Scanning file', fn )
 
-            with open( fn, 'r' ) as f:
+            if sys.version_info[0] < 3:
 
-                scan_header_dependencies( f, x, gm, deps )
+                with open( fn, 'r' ) as f:
+                    scan_header_dependencies( f, x, gm, deps )
+
+            else:
+
+                with open( fn, 'r', encoding='latin-1' ) as f:
+                    scan_header_dependencies( f, x, gm, deps )
 
 
 def scan_module_dependencies( m, x, gm, deps, dirs ):
