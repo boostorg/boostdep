@@ -9,6 +9,8 @@
 # See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt
 
+from __future__ import print_function
+
 import re
 import sys
 import os
@@ -19,10 +21,7 @@ verbose = 0
 def vprint( level, *args ):
 
     if verbose >= level:
-
-        for arg in args:
-            print arg,
-        print
+        print( *args )
 
 
 def is_module( m, gm ):
@@ -95,7 +94,7 @@ def scan_directory( d, x, gm, deps ):
 
     vprint( 1, 'Scanning directory', d )
 
-    if os.name == 'nt':
+    if os.name == 'nt' and sys.version_info[0] < 3:
         d = unicode( d )
 
     for root, dirs, files in os.walk( d ):
