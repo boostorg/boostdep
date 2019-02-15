@@ -266,6 +266,7 @@ if( __name__ == "__main__" ):
 
     for dep in args.ignore:
         if dep in deps:
+            vprint( 1, 'Ignoring dependency', dep )
             del deps[dep]
 
     vprint( 2, 'Dependencies:', deps )
