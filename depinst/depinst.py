@@ -141,7 +141,7 @@ def read_exceptions():
             line = line.rstrip()
 
             m = re.match( '(.*):$', line )
-            
+
             if m:
 
                 module = m.group( 1 ).replace( '~', '/' )
@@ -171,7 +171,7 @@ def read_gitmodules():
             if m:
 
                 gm.append( m.group( 1 ) )
-                
+
     return gm
 
 def install_modules( modules, git_args ):
@@ -223,6 +223,7 @@ if( __name__ == "__main__" ):
     parser.add_argument( '-v', '--verbose', help='enable verbose output', action='count', default=0 )
     parser.add_argument( '-q', '--quiet', help='quiet output (opposite of -v)', action='count', default=0 )
     parser.add_argument( '-X', '--exclude', help="exclude a default subdirectory ('include', 'src', or 'test') from scan; can be repeated", metavar='DIR', action='append', default=[] )
+    parser.add_argument( '-N', '--ignore', help="exclude top-level dependency even when found in scan; can be repeated", metavar='LIB', action='append', default=[] )
     parser.add_argument( '-I', '--include', help="additional subdirectory to scan; can be repeated", metavar='DIR', action='append', default=[] )
     parser.add_argument( '-g', '--git_args', help="additional arguments to `git submodule update`", default='', action='store' )
     parser.add_argument( 'library', help="name of library to scan ('libs/' will be prepended)" )
@@ -233,6 +234,7 @@ if( __name__ == "__main__" ):
 
     vprint( 2, '-X:', args.exclude )
     vprint( 2, '-I:', args.include )
+    vprint( 2, '-N:', args.ignore )
 
     x = read_exceptions()
     vprint( 2, 'Exceptions:', x )
@@ -261,6 +263,10 @@ if( __name__ == "__main__" ):
     vprint( 1, 'Directories to scan:', *dirs )
 
     scan_module_dependencies( m, x, gm, deps, dirs )
+
+    for dep in args.ignore:
+        if dep in deps:
+            del deps[dep]
 
     vprint( 2, 'Dependencies:', deps )
 
