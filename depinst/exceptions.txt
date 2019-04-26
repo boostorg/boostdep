@@ -62,9 +62,6 @@ detail:
   boost/blank.hpp
   boost/blank_fwd.hpp
   boost/cstdlib.hpp
-disjoint_sets:
-  boost/pending/detail/disjoint_sets.hpp
-  boost/pending/disjoint_sets.hpp
 dynamic_bitset:
   boost/dynamic_bitset_fwd.hpp
 exception:
