@@ -62,9 +62,6 @@ detail:
   boost/blank.hpp
   boost/blank_fwd.hpp
   boost/cstdlib.hpp
-disjoint_sets:
-  boost/pending/detail/disjoint_sets.hpp
-  boost/pending/disjoint_sets.hpp
 dynamic_bitset:
   boost/dynamic_bitset_fwd.hpp
 exception:
@@ -77,7 +74,9 @@ graph:
   boost/detail/algorithm.hpp
   boost/pending/bucket_sorter.hpp
   boost/pending/container_traits.hpp
+  boost/pending/detail/disjoint_sets.hpp
   boost/pending/detail/property.hpp
+  boost/pending/disjoint_sets.hpp
   boost/pending/fenced_priority_queue.hpp
   boost/pending/fibonacci_heap.hpp
   boost/pending/indirect_cmp.hpp
