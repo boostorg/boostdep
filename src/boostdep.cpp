@@ -434,6 +434,44 @@ struct header_inclusion_actions
     virtual void header( std::string const & header ) = 0;
 };
 
+static std::string module_for_header( std::string header )
+{
+    {
+        std::map<std::string, std::string>::const_iterator i = s_header_map.find( header );
+
+        if( i != s_header_map.end() )
+        {
+            return i->second;
+        }
+    }
+
+    if( header.substr( 0, 5 ) == "libs/" )
+    {
+        header = header.substr( 5 );
+    }
+    else if( header.substr( 0, 5 ) == "test/" )
+    {
+        header = header.substr( 5 );
+    }
+    else
+    {
+        return std::string();
+    }
+
+    for( std::set<std::string>::const_iterator i = s_modules.begin(); i != s_modules.end(); ++i )
+    {
+        std::string module = *i;
+        std::replace( module.begin(), module.end(), '~', '/' );
+
+        if( header.substr( 0, module.size() + 1 ) == module + '/' )
+        {
+            return *i;
+        }
+    }
+
+    return std::string();
+}
+
 static void output_header_inclusion_report( std::string const & header, header_inclusion_actions & actions )
 {
     std::string module = s_header_map[ header ];
@@ -449,7 +487,7 @@ static void output_header_inclusion_report( std::string const & header, header_i
 
     for( std::set< std::string >::iterator i = from.begin(); i != from.end(); ++i )
     {
-        from2[ s_header_map[ *i ] ].insert( *i );
+        from2[ module_for_header( *i ) ].insert( *i );
     }
 
     for( std::map< std::string, std::set< std::string > >::iterator i = from2.begin(); i != from2.end(); ++i )
@@ -699,13 +737,13 @@ static void output_module_reverse_report( std::string const & module, module_rev
 
         for( std::map< std::string, std::set< std::string > >::iterator j = s_header_deps.begin(); j != s_header_deps.end(); ++j )
         {
-            if( s_header_map[ j->first ] == module )
+            if( module_for_header( j->first ) == module )
             {
                 bool header_started = false;
 
                 for( std::set< std::string >::iterator k = j->second.begin(); k != j->second.end(); ++k )
                 {
-                    if( s_header_map[ *k ] == *i )
+                    if( module_for_header( *k ) == *i )
                     {
                         if( !header_started )
                         {
