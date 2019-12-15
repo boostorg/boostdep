@@ -226,6 +226,7 @@ if( __name__ == "__main__" ):
     parser.add_argument( '-N', '--ignore', help="exclude top-level dependency even when found in scan; can be repeated", metavar='LIB', action='append', default=[] )
     parser.add_argument( '-I', '--include', help="additional subdirectory to scan; can be repeated", metavar='DIR', action='append', default=[] )
     parser.add_argument( '-g', '--git_args', help="additional arguments to `git submodule update`", default='', action='store' )
+    parser.add_argument( '-u', '--update', help='update library argument as well', action='store_true' )
     parser.add_argument( 'library', help="name of library to scan ('libs/' will be prepended)" )
 
     args = parser.parse_args()
@@ -251,6 +252,10 @@ if( __name__ == "__main__" ):
     m = args.library
 
     deps = { m : 1 }
+
+    if args.update:
+        vprint( 1, 'Update submodule:', m )
+        install_modules( [m], args.git_args )
 
     dirs = [ 'include', 'src', 'test' ]
 
