@@ -243,7 +243,7 @@ if( __name__ == "__main__" ):
     gm = read_gitmodules()
     vprint( 2, '.gitmodules:', gm )
 
-    essentials = [ 'config', 'headers', '../tools/boost_install', '../tools/build' ]
+    essentials = [ 'config', 'headers', '../tools/boost_install', '../tools/build', '../tools/cmake' ]
 
     essentials = [ e for e in essentials if os.path.exists( 'libs/' + e ) ]
 
