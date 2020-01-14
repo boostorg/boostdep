@@ -1,5 +1,5 @@
 [/
-  Copyright 2015-2017 Peter Dimov
+  Copyright 2015-2020 Peter Dimov
 
   Distributed under the Boost Software License, Version 1.0.
 
@@ -10,7 +10,7 @@
 [article Boostdep
   [quickbook 1.6]
   [id boostdep]
-  [copyright 2014-2017 Peter Dimov]
+  [copyright 2014-2020 Peter Dimov]
   [license Distributed under the
     [@http://boost.org/LICENSE_1_0.txt Boost Software License, Version 1.0].
   ]
@@ -690,7 +690,7 @@ dist/bin/boostdep --test filesystem
 
 [section --cmake]
 
-[^boostdep --cmake /module/] lists the dependencies of /module/ in a =cmake=-friendly form. This is typically used to generate a =dependencies.cmake= file.
+[^boostdep --cmake /module/] generates a =CMakeLists.txt= file for /module/.
 
 [endsect]
 
