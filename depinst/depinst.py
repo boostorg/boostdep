@@ -3,7 +3,7 @@
 # depinst.py - installs the dependencies needed to test
 #              a Boost library
 #
-# Copyright 2016-2019 Peter Dimov
+# Copyright 2016-2020 Peter Dimov
 #
 # Distributed under the Boost Software License, Version 1.0.
 # See accompanying file LICENSE_1_0.txt or copy at
@@ -191,7 +191,10 @@ def install_modules( modules, git_args ):
     command += ' update --init ' + git_args + ' ' + ' '.join( modules )
 
     vprint( 1, 'Executing:', command )
-    os.system( command );
+    r = os.system( command );
+
+    if r != 0:
+        raise Exception( "The command '%s' failed with exit code %d" % (command, r) )
 
 
 def install_module_dependencies( deps, x, gm, git_args ):
