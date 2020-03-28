@@ -180,7 +180,6 @@ parameter_python:
   boost/parameter/aux_/python/invoker_iterate.hpp
   boost/parameter/python.hpp
 predef:
-  boost/detail/endian.hpp
   boost/predef.h
 random:
   boost/nondet_random.hpp
