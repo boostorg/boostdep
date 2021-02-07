@@ -181,6 +181,8 @@ parameter_python:
   boost/parameter/python.hpp
 predef:
   boost/predef.h
+qvm:
+  boost/qvm_lite.hpp
 random:
   boost/nondet_random.hpp
 regex:
