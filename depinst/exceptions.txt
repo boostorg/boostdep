@@ -181,6 +181,19 @@ parameter_python:
   boost/parameter/python.hpp
 predef:
   boost/predef.h
+property_map_parallel:
+  boost/property_map/parallel/basic_reduce.hpp
+  boost/property_map/parallel/caching_property_map.hpp
+  boost/property_map/parallel/detail/untracked_pair.hpp
+  boost/property_map/parallel/distributed_property_map.hpp
+  boost/property_map/parallel/global_index_map.hpp
+  boost/property_map/parallel/impl/distributed_property_map.ipp
+  boost/property_map/parallel/local_property_map.hpp
+  boost/property_map/parallel/parallel_property_maps.hpp
+  boost/property_map/parallel/process_group.hpp
+  boost/property_map/parallel/simple_trigger.hpp
+  boost/property_map/parallel/unsafe_serialize.hpp
+  boost/property_map/parallel/vector_property_map.hpp
 qvm:
   boost/qvm_lite.hpp
 random:
