@@ -2901,7 +2901,7 @@ int main( int argc, char const* argv[] )
 
     bool html = false;
     bool secondary = false;
-    bool track_sources = false;
+    bool track_sources = true;
     bool track_tests = false;
 
     std::string html_title = "Boost Dependency Report";
