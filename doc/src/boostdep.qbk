@@ -251,6 +251,7 @@ Usage:
     boostdep --cmake <module>
     boostdep --pkgconfig <module> <version> \[<var>=<value>\] \[<var>=<value>\]...
     boostdep \[options\] --subset-for <directory>
+    boostdep --brief <module>
 
     \[options\]: \[--boost-root <path-to-boost>\]
                \[--\[no-\]track-sources\] \[--\[no-\]track-tests\]
@@ -716,6 +717,16 @@ dist/bin/boostdep --subset-for d:\my_app
 
 [endsect]
 
+[section --brief]
+
+[^boostdep --brief /module/] generates a brief dependency report for /module/. All the primary and secondary dependencies are listed, one per line.
+
+[pre
+dist/bin/boostdep --brief filesystem
+]
+
+[endsect]
+
 [section --boost-root]
 
 [^--boost-root /path-to-boost/] instructs /Boostdep/ to look for the Boost root directory at /path-to-boost/. If this option
@@ -727,15 +738,15 @@ Boost root.
 
 [section --track-sources]
 
-The =--track-sources= option instructs /Boostdep/ to scan the =src= library subdirectory for `#include` directives. By default,
-only the =include= subdirectory is scanned.
+The =--track-sources= option instructs /Boostdep/ to scan the =src= library subdirectory for `#include` directives. If not enabled,
+only the =include= subdirectory is scanned. This option on by default in 1.77 and later, and can be turned off with =--no-track-sources=.
 
 [endsect]
 
 [section --track-tests]
 
 The =--track-tests= option instructs /Boostdep/ to scan the =test= library subdirectory for `#include` directives. By default,
-only the =include= subdirectory is scanned.
+the =test= subdirectory is not scanned.
 
 [endsect]
 
