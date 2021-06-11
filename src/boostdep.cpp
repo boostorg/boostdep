@@ -2342,6 +2342,93 @@ static void output_module_cmake_report( std::string module )
     ;
 }
 
+// --brief
+
+struct module_brief_primary_actions: public module_primary_actions
+{
+    std::set< std::string > & m_;
+
+    module_brief_primary_actions( std::set< std::string > & m ): m_( m )
+    {
+    }
+
+    void heading( std::string const & /*module*/ )
+    {
+        std::cout << "# Primary dependencies\n\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+        std::cout << module << "\n";
+        m_.insert( module );
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void header_start( std::string const & /*header*/ )
+    {
+    }
+
+    void header_end( std::string const & /*header*/ )
+    {
+    }
+
+    void from_header( std::string const & /*header*/ )
+    {
+    }
+};
+
+struct module_brief_secondary_actions: public module_secondary_actions
+{
+    std::set< std::string > & m_;
+
+    module_brief_secondary_actions( std::set< std::string > & m ): m_( m )
+    {
+    }
+
+    void heading( std::string const & /*module*/ )
+    {
+        std::cout << "# Secondary dependencies\n\n";
+    }
+
+    void module_start( std::string const & /*module*/ )
+    {
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void module_adds( std::string const & module )
+    {
+        if( m_.count( module ) == 0 )
+        {
+            std::cout << module << "\n";
+            m_.insert( module );
+        }
+    }
+};
+
+static void output_module_brief_report( std::string const & module, bool track_sources, bool track_tests )
+{
+    std::set< std::string > m;
+
+    std::cout << "Brief dependency report for " << module << " (sources " << (track_sources? "on": "off") << ", tests " << (track_tests? "on": "off") << "):\n\n";
+
+    module_brief_primary_actions a1( m );
+    output_module_primary_report( module, a1, track_sources, track_tests );
+
+    std::cout << "\n";
+
+    std::set< std::string > m2( m );
+    m2.insert( module );
+
+    module_brief_secondary_actions a2( m2 );
+    output_module_secondary_report( module, m, a2 );
+}
+
 // --list-missing-headers
 
 struct missing_header_actions: public module_primary_actions
@@ -2746,6 +2833,7 @@ int main( int argc, char const* argv[] )
             "    boostdep --cmake <module>\n"
             "    boostdep --pkgconfig <module> <version> [<var>=<value>] [<var>=<value>]...\n"
             "    boostdep [options] --subset-for <directory>\n"
+            "    boostdep --brief <module>\n"
             "\n"
             "    [options]: [--boost-root <path-to-boost>]\n"
             "               [--[no-]track-sources] [--[no-]track-tests]\n"
@@ -2945,6 +3033,14 @@ int main( int argc, char const* argv[] )
             if( i + 1 < argc )
             {
                 output_module_cmake_report( argv[ ++i ] );
+            }
+        }
+        else if( option == "--brief" )
+        {
+            if( i + 1 < argc )
+            {
+                enable_secondary( secondary, track_sources, track_tests );
+                output_module_brief_report( argv[ ++i ], track_sources, track_tests );
             }
         }
         else if( option == "--module-levels" )
