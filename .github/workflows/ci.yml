@@ -74,7 +74,7 @@ jobs:
             install: clang-7
           - toolset: clang
             compiler: clang++-8
-            cxxstd: "03,11,14,17,2a"
+            cxxstd: "03,11,14,17"
             os: ubuntu-20.04
             install: clang-8
           - toolset: clang
@@ -190,3 +190,81 @@ jobs:
         run: |
           cd ../boost-root
           b2 -j3 tools/boostdep/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} address-model=${{matrix.addrmd}} variant=debug,release
+
+  posix-python3:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Boost
+        run: |
+          echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
+          echo GITHUB_BASE_REF: $GITHUB_BASE_REF
+          echo GITHUB_REF: $GITHUB_REF
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          REF=${REF#refs/heads/}
+          echo REF: $REF
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          echo BOOST_BRANCH: $BOOST_BRANCH
+          cd ..
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          cd boost-root
+          git submodule update --init tools/build
+          cp -r $GITHUB_WORKSPACE/* tools/boostdep
+          ./bootstrap.sh
+
+      - name: Build Boostdep
+        run: |
+          cd ../boost-root
+          python3 tools/boostdep/depinst/depinst.py --git_args "--jobs 3" ../tools/boostdep
+          ./b2 -j3 tools/boostdep/build
+
+  posix-cmake:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install packages
+        run: sudo apt-get install libboost-filesystem-dev
+
+      - name: Build Boostdep with CMake
+        run: |
+          cd ../boost-root
+          mkdir __build__ && cd __build__
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~ ..
+          cmake --build . --target install
+
+  posix-check-exceptions:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Boost
+        run: |
+          echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
+          echo GITHUB_BASE_REF: $GITHUB_BASE_REF
+          echo GITHUB_REF: $GITHUB_REF
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          REF=${REF#refs/heads/}
+          echo REF: $REF
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          echo BOOST_BRANCH: $BOOST_BRANCH
+          cd ..
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          cd boost-root
+          git submodule update --init
+          rm -rf tools/boostdep/*
+          cp -r $GITHUB_WORKSPACE/* tools/boostdep
+          ./bootstrap.sh
+          ./b2 tools/boostdep/build
+
+      - name: Check exceptions
+        run: |
+          cd ../boost-root
+          dist/bin/boostdep --list-exceptions | diff -u tools/boostdep/depinst/exceptions.txt -
