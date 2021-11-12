@@ -233,7 +233,6 @@ jobs:
 
       - name: Build Boostdep with CMake
         run: |
-          cd ../boost-root
           mkdir __build__ && cd __build__
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~ ..
           cmake --build . --target install
