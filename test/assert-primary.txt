@@ -4,6 +4,8 @@ config:
     <boost/config.hpp>
         from <boost/assert.hpp>
         from <boost/assert/source_location.hpp>
+    <boost/config/workaround.hpp>
+        from <boost/assert/source_location.hpp>
     <boost/cstdint.hpp>
         from <boost/assert/source_location.hpp>
 
