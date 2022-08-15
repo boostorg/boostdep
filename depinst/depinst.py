@@ -15,6 +15,8 @@ import re
 import sys
 import os
 import argparse
+import subprocess
+import time
 
 verbose = 0
 
@@ -190,12 +192,39 @@ def install_modules( modules, git_args ):
 
     command += ' update --init ' + git_args + ' ' + ' '.join( modules )
 
-    vprint( 1, 'Executing:', command )
-    r = os.system( command );
+    git_retries=10
+    git_delay=30
+    git_count=1
+    while git_count <= git_retries:
+        if git_count > 1:
+            additional_message = "    # attempt " + str(git_count)
+        else:
+            additional_message = ""
+        vprint( 1, 'Executing:', command, additional_message )
+        std_out = ""
+        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True, shell=True)
+        with p.stdout:
+            for line in iter(p.stdout.readline,""):
+                print(line, end='')
+                std_out += line
+            p.wait() # wait for the subprocess to exit
 
-    if r != 0:
-        raise Exception( "The command '%s' failed with exit code %d" % (command, r) )
-
+        if p.returncode == 0:
+            vprint(1, "git submodule update completed")
+            break
+        else:
+            vprint(1, "An error occurred during git submodule update.")
+            # Not all errors should be retried. Let's choose specific errors that would benefit from a retry. More scenarios can be added here.
+            retry=False
+            if "Could not resolve host: github.com" in std_out:
+                retry=True
+            if retry == True:
+                git_count = git_count + 1
+                vprint(1, "Delaying " + str(git_delay) + " seconds before retry.")
+                time.sleep(git_delay)
+            else:
+                err_msg = "%s. Code: %s" % ("git submodule update failed", p.returncode)
+                raise Exception(err_msg)
 
 def install_module_dependencies( deps, x, gm, git_args ):
 
