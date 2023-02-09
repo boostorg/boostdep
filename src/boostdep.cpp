@@ -1195,7 +1195,7 @@ static void output_module_level_report( module_level_actions & actions )
                     level = std::max( level, level_map[ *j ] + 1 );
                 }
 
-                if( level == k )
+                if( level == static_cast<int>(k) )
                 {
                     level_map[ i->first ] = level;
                     // std::cerr << i->first << ": " << level << std::endl;
