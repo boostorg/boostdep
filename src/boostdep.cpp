@@ -26,6 +26,12 @@
 
 namespace fs = boost::filesystem;
 
+enum output_format
+{
+   txt_output = 0,
+   html_output = 1
+};
+
 // header -> module
 static std::map< std::string, std::string > s_header_map;
 
@@ -597,9 +603,9 @@ struct module_primary_html_actions: public module_primary_actions
     }
 };
 
-static void output_module_primary_report( std::string const & module, bool html, bool track_sources, bool track_tests )
+static void output_module_primary_report( std::string const & module, output_format out_fmt, bool track_sources, bool track_tests )
 {
-    if( html )
+    if( out_fmt == html_output )
     {
         module_primary_html_actions actions;
         output_module_primary_report( module, actions, track_sources, track_tests );
@@ -670,9 +676,9 @@ struct module_secondary_html_actions: public module_secondary_actions
     }
 };
 
-static void output_module_secondary_report( std::string const & module, bool html )
+static void output_module_secondary_report( std::string const & module, output_format out_fmt )
 {
-    if( html )
+    if( out_fmt == html_output )
     {
         module_secondary_html_actions actions;
         output_module_secondary_report( module, actions );
@@ -740,9 +746,9 @@ struct header_inclusion_html_actions: public header_inclusion_actions
     }
 };
 
-static void output_header_report( std::string const & header, bool html )
+static void output_header_report( std::string const & header, output_format out_fmt )
 {
-    if( html )
+    if( out_fmt == html_output )
     {
         header_inclusion_html_actions actions;
         output_header_inclusion_report( header, actions );
@@ -886,9 +892,9 @@ struct module_reverse_html_actions: public module_reverse_actions
     }
 };
 
-static void output_module_reverse_report( std::string const & module, bool html )
+static void output_module_reverse_report( std::string const & module, output_format out_fmt )
 {
-    if( html )
+    if( out_fmt == html_output )
     {
         module_reverse_html_actions actions;
         output_module_reverse_report( module, actions );
@@ -1239,9 +1245,9 @@ struct module_level_html_actions: public module_level_actions
     }
 };
 
-static void output_module_level_report( bool html )
+static void output_module_level_report( output_format out_fmt )
 {
-    if( html )
+    if( out_fmt == html_output )
     {
         module_level_html_actions actions;
         output_module_level_report( actions );
@@ -1351,9 +1357,9 @@ struct module_overview_html_actions: public module_overview_actions
     }
 };
 
-static void output_module_overview_report( bool html )
+static void output_module_overview_report( output_format out_fmt )
 {
-    if( html )
+    if( out_fmt == html_output )
     {
         module_overview_html_actions actions;
         output_module_overview_report( actions );
@@ -1732,9 +1738,9 @@ struct module_weight_html_actions: public module_weight_actions
     }
 };
 
-static void output_module_weight_report( bool html )
+static void output_module_weight_report( output_format out_fmt )
 {
-    if( html )
+    if( out_fmt == html_output )
     {
         module_weight_html_actions actions;
         output_module_weight_report( actions );
@@ -1976,9 +1982,9 @@ struct module_subset_html_actions: public module_subset_actions
     }
 };
 
-static void output_module_subset_report( std::string const & module, bool track_sources, bool track_tests, bool html )
+static void output_module_subset_report( std::string const & module, bool track_sources, bool track_tests, output_format out_fmt )
 {
-    if( html )
+    if( out_fmt == html_output )
     {
         module_subset_html_actions actions;
         output_module_subset_report( module, track_sources, track_tests, actions );
@@ -2699,7 +2705,7 @@ static void output_pkgconfig( std::string const & module, std::string const & ve
 
 // --subset-for
 
-static void output_directory_subset_report( std::string const & module, std::set<std::string> const & headers, bool html )
+static void output_directory_subset_report( std::string const & module, std::set<std::string> const & headers, output_format out_fmt )
 {
     for( std::set<std::string>::const_iterator i = headers.begin(); i != headers.end(); ++i )
     {
@@ -2718,7 +2724,7 @@ static void output_directory_subset_report( std::string const & module, std::set
         }
     }
 
-    if( html )
+    if( out_fmt == html_output )
     {
         module_subset_html_actions actions;
         output_module_subset_report_( module, headers, actions );
@@ -2990,7 +2996,7 @@ int main( int argc, char const* argv[] )
         std::cerr << x.what() << std::endl;
     }
 
-    bool html = false;
+    output_format out_fmt = txt_output;
     bool secondary = false;
     bool track_sources = true;
     bool track_tests = false;
@@ -3051,9 +3057,9 @@ int main( int argc, char const* argv[] )
         }
         else if( option == "--html" )
         {
-            if( !html )
+            if( out_fmt != html_output )
             {
-                html = true;
+                out_fmt = html_output;
                 output_html_header( html_title, html_stylesheet, html_prefix );
             }
         }
@@ -3077,7 +3083,7 @@ int main( int argc, char const* argv[] )
         {
             if( i + 1 < argc )
             {
-                output_module_primary_report( argv[ ++i ], html, track_sources, track_tests );
+                output_module_primary_report( argv[ ++i ], out_fmt, track_sources, track_tests );
             }
         }
         else if( option == "--secondary" )
@@ -3085,7 +3091,7 @@ int main( int argc, char const* argv[] )
             if( i + 1 < argc )
             {
                 enable_secondary( secondary, track_sources, track_tests );
-                output_module_secondary_report( argv[ ++i ], html );
+                output_module_secondary_report( argv[ ++i ], out_fmt );
             }
         }
         else if( option == "--reverse" )
@@ -3093,7 +3099,7 @@ int main( int argc, char const* argv[] )
             if( i + 1 < argc )
             {
                 enable_secondary( secondary, track_sources, track_tests );
-                output_module_reverse_report( argv[ ++i ], html );
+                output_module_reverse_report( argv[ ++i ], out_fmt );
             }
         }
         else if( option == "--header" )
@@ -3101,7 +3107,7 @@ int main( int argc, char const* argv[] )
             if( i + 1 < argc )
             {
                 enable_secondary( secondary, track_sources, track_tests );
-                output_header_report( argv[ ++i ], html );
+                output_header_report( argv[ ++i ], out_fmt );
             }
         }
         else if( option == "--subset" )
@@ -3109,7 +3115,7 @@ int main( int argc, char const* argv[] )
             if( i + 1 < argc )
             {
                 enable_secondary( secondary, track_sources, track_tests );
-                output_module_subset_report( argv[ ++i ], track_sources, track_tests, html );
+                output_module_subset_report( argv[ ++i ], track_sources, track_tests, out_fmt );
             }
         }
         else if( option == "--test" )
@@ -3137,17 +3143,17 @@ int main( int argc, char const* argv[] )
         else if( option == "--module-levels" )
         {
             enable_secondary( secondary, track_sources, track_tests );
-            output_module_level_report( html );
+            output_module_level_report( out_fmt );
         }
         else if( option == "--module-overview" )
         {
             enable_secondary( secondary, track_sources, track_tests );
-            output_module_overview_report( html );
+            output_module_overview_report( out_fmt );
         }
         else if( option == "--module-weights" )
         {
             enable_secondary( secondary, track_sources, track_tests );
-            output_module_weight_report( html );
+            output_module_weight_report( out_fmt );
         }
         else if( option == "--list-dependencies" )
         {
@@ -3191,7 +3197,7 @@ int main( int argc, char const* argv[] )
                 std::set<std::string> headers;
                 add_module_headers( module, headers );
 
-                output_directory_subset_report( module, headers, html );
+                output_directory_subset_report( module, headers, out_fmt );
             }
             else
             {
@@ -3242,12 +3248,12 @@ int main( int argc, char const* argv[] )
         }
         else if( s_modules.count( option ) )
         {
-            output_module_primary_report( option, html, track_sources, track_tests );
+            output_module_primary_report( option, out_fmt, track_sources, track_tests );
         }
         else if( s_header_map.count( option ) )
         {
             enable_secondary( secondary, track_sources, track_tests );
-            output_header_report( option, html );
+            output_header_report( option, out_fmt );
         }
         else
         {
@@ -3255,7 +3261,7 @@ int main( int argc, char const* argv[] )
         }
     }
 
-    if( html )
+    if( out_fmt == html_output )
     {
         output_html_footer( html_footer );
     }
