@@ -976,7 +976,7 @@ static void output_module_level_report( module_level_actions & actions )
 
     // compute acyclic levels
 
-    for( int k = 1, n = s_modules.size(); k < n; ++k )
+    for( std::size_t k = 1, n = s_modules.size(); k < n; ++k )
     {
         for( std::map< std::string, std::set< std::string > >::iterator i = s_module_deps.begin(); i != s_module_deps.end(); ++i )
         {
@@ -1015,7 +1015,7 @@ static void output_module_level_report( module_level_actions & actions )
 
     // compute levels for cyclic modules
 
-    for( int k = 1, n = s_modules.size(); k < n; ++k )
+    for( std::size_t k = 1, n = s_modules.size(); k < n; ++k )
     {
         for( std::map< std::string, std::set< std::string > >::iterator i = s_module_deps.begin(); i != s_module_deps.end(); ++i )
         {
