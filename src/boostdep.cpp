@@ -168,6 +168,7 @@ static void scan_header_dependencies( std::string const & header, std::istream &
 struct module_primary_actions
 {
     virtual void heading( std::string const & module ) = 0;
+    virtual void footer( std::string const & module )    = 0;
 
     virtual void module_start( std::string const & module ) = 0;
     virtual void module_end( std::string const & module ) = 0;
@@ -281,6 +282,8 @@ static void scan_module_dependencies( std::string const & module, module_primary
 
         actions.module_end( i->first );
     }
+
+    actions.footer( module );
 }
 
 // module depends on [ module, module... ]
@@ -304,6 +307,10 @@ struct build_mdmap_actions: public module_primary_actions
     void heading( std::string const & module )
     {
         module_ = module;
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -365,6 +372,7 @@ static void output_module_primary_report( std::string const & module, module_pri
 struct module_secondary_actions
 {
     virtual void heading( std::string const & module ) = 0;
+    virtual void footer( std::string const & module )    = 0;
 
     virtual void module_start( std::string const & module ) = 0;
     virtual void module_end( std::string const & module ) = 0;
@@ -424,6 +432,8 @@ static void output_module_secondary_report( std::string const & module, std::set
             deps = deps2;
         }
     }
+
+    actions.footer( module );
 }
 
 static void output_module_secondary_report( std::string const & module, module_secondary_actions & actions )
@@ -434,6 +444,7 @@ static void output_module_secondary_report( std::string const & module, module_s
 struct header_inclusion_actions
 {
     virtual void heading( std::string const & header, std::string const & module ) = 0;
+    virtual void footer( std::string const & header, std::string const & module ) = 0;
 
     virtual void module_start( std::string const & module ) = 0;
     virtual void module_end( std::string const & module ) = 0;
@@ -508,6 +519,8 @@ static void output_header_inclusion_report( std::string const & header, header_i
 
         actions.module_end( i->first );
     }
+
+    actions.footer( header, module );
 }
 
 // output_module_primary_report
@@ -517,6 +530,10 @@ struct module_primary_txt_actions: public module_primary_actions
     void heading( std::string const & module )
     {
         std::cout << "Primary dependencies for " << module << ":\n\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -549,6 +566,10 @@ struct module_primary_html_actions: public module_primary_actions
     void heading( std::string const & module )
     {
         std::cout << "\n\n<h1 id=\"primary-dependencies\">Primary dependencies for <em>" << module << "</em></h1>\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -599,6 +620,10 @@ struct module_secondary_txt_actions: public module_secondary_actions
         std::cout << "Secondary dependencies for " << module << ":\n\n";
     }
 
+    void footer( std::string const & /*module */ )
+    {
+    }
+
     void module_start( std::string const & module )
     {
         std::cout << module << ":\n";
@@ -622,6 +647,10 @@ struct module_secondary_html_actions: public module_secondary_actions
     void heading( std::string const & module )
     {
         std::cout << "\n\n<h1 id=\"secondary-dependencies\">Secondary dependencies for <em>" << module << "</em></h1>\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -664,6 +693,10 @@ struct header_inclusion_txt_actions: public header_inclusion_actions
         std::cout << "Inclusion report for <" << header << "> (in module " << module << "):\n\n";
     }
 
+    void footer( std::string const & /*header*/, std::string const & /*module */ )
+    {
+    }
+
     void module_start( std::string const & module )
     {
         std::cout << "    from " << module << ":\n";
@@ -685,6 +718,10 @@ struct header_inclusion_html_actions: public header_inclusion_actions
     void heading( std::string const & header, std::string const & module )
     {
         std::cout << "<h1>Inclusion report for <code>&lt;" << header << "&gt;</code> (in module <em>" << module << "</em>)</h1>\n";
+    }
+
+    void footer( std::string const & /*header*/, std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -722,6 +759,7 @@ static void output_header_report( std::string const & header, bool html )
 struct module_reverse_actions
 {
     virtual void heading( std::string const & module ) = 0;
+    virtual void footer( std::string const & module ) = 0;
 
     virtual void module_start( std::string const & module ) = 0;
     virtual void module_end( std::string const & module ) = 0;
@@ -772,6 +810,8 @@ static void output_module_reverse_report( std::string const & module, module_rev
 
         actions.module_end( *i );
     }
+
+    actions.footer( module );
 }
 
 struct module_reverse_txt_actions: public module_reverse_actions
@@ -779,6 +819,10 @@ struct module_reverse_txt_actions: public module_reverse_actions
     void heading( std::string const & module )
     {
         std::cout << "Reverse dependencies for " << module << ":\n\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -811,6 +855,10 @@ struct module_reverse_html_actions: public module_reverse_actions
     void heading( std::string const & module )
     {
         std::cout << "\n\n<h1 id=\"reverse-dependencies\">Reverse dependencies for <em>" << module << "</em></h1>\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -1461,6 +1509,10 @@ static void output_module_weight_report( module_weight_actions & actions )
             module_ = module;
         }
 
+        void footer( std::string const & /*module */ )
+        {
+        }
+
         void module_start( std::string const & /*module*/ )
         {
         }
@@ -1699,6 +1751,7 @@ static void output_module_weight_report( bool html )
 struct module_subset_actions
 {
     virtual void heading( std::string const & module ) = 0;
+    virtual void footer( std::string const & module ) = 0;
 
     virtual void module_start( std::string const & module ) = 0;
     virtual void module_end( std::string const & module ) = 0;
@@ -1822,6 +1875,8 @@ static void output_module_subset_report_( std::string const & module, std::set<s
 
         actions.module_end( i->first );
     }
+
+    actions.footer( module );
 }
 
 static void output_module_subset_report( std::string const & module, bool track_sources, bool track_tests, module_subset_actions & actions )
@@ -1846,6 +1901,10 @@ struct module_subset_txt_actions: public module_subset_actions
     void heading( std::string const & module )
     {
         std::cout << "Subset dependencies for " << module << ":\n\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -1883,6 +1942,10 @@ struct module_subset_html_actions: public module_subset_actions
     void heading( std::string const & module )
     {
         std::cout << "\n\n<h1 id=\"subset-dependencies\">Subset dependencies for <em>" << module << "</em></h1>\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -1975,6 +2038,10 @@ struct module_test_primary_actions: public module_primary_actions
         std::cout << "Test dependencies for " << module << ":\n\n";
     }
 
+    void footer( std::string const & /*module */ )
+    {
+    }
+
     void module_start( std::string const & module )
     {
         std::cout << module << "\n";
@@ -2008,6 +2075,10 @@ struct module_test_secondary_actions: public module_secondary_actions
     }
 
     void heading( std::string const & /*module*/ )
+    {
+    }
+
+    void footer( std::string const & /*module */ )
     {
     }
 
@@ -2057,6 +2128,10 @@ struct collect_primary_dependencies: public module_primary_actions
     std::set< std::string > set_;
 
     void heading( std::string const & )
+    {
+    }
+
+    void footer( std::string const & /*module */ )
     {
     }
 
@@ -2357,6 +2432,10 @@ struct module_brief_primary_actions: public module_primary_actions
         std::cout << "# Primary dependencies\n\n";
     }
 
+    void footer( std::string const & /*module */ )
+    {
+    }
+
     void module_start( std::string const & module )
     {
         std::cout << module << "\n";
@@ -2391,6 +2470,10 @@ struct module_brief_secondary_actions: public module_secondary_actions
     void heading( std::string const & /*module*/ )
     {
         std::cout << "# Secondary dependencies\n\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & /*module*/ )
@@ -2438,6 +2521,10 @@ struct missing_header_actions: public module_primary_actions
     void heading( std::string const & module )
     {
         module_ = module;
+    }
+
+    void footer( std::string const & /*module */ )
+    {
     }
 
     void module_start( std::string const & module )
@@ -2498,6 +2585,10 @@ struct primary_pkgconfig_actions: public module_primary_actions
     std::string list_;
 
     void heading( std::string const & )
+    {
+    }
+
+    void footer( std::string const & /*module */ )
     {
     }
 
