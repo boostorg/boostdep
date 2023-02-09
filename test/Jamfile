@@ -10,3 +10,5 @@ path-constant HERE : . ;
 
 run ../src/boostdep.cpp /boost//filesystem : --boost-root $(ROOT) --capture-output assert --compare-output $(HERE)/assert-primary.txt : : : assert-primary ;
 run ../src/boostdep.cpp /boost//filesystem : --boost-root $(ROOT) --capture-output --secondary bind --compare-output $(HERE)/bind-secondary.txt : : : bind-secondary ;
+run ../src/boostdep.cpp /boost//filesystem : --boost-root $(ROOT) --csv --capture-output assert --compare-output $(HERE)/assert-primary.csv : : : assert-primary-csv ;
+run ../src/boostdep.cpp /boost//filesystem : --boost-root $(ROOT) --csv --capture-output --secondary bind --compare-output $(HERE)/bind-secondary.csv : : : bind-secondary-csv ;
