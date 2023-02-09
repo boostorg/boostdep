@@ -1490,7 +1490,7 @@ static void output_module_weight_report( module_weight_actions & actions )
 
     for( std::set< std::string >::const_iterator i = s_modules.begin(); i != s_modules.end(); ++i )
     {
-        int w = s_module_deps[ *i ].size() + secondary_deps[ *i ].size();
+        int w = static_cast<int>( s_module_deps[ *i ].size() + secondary_deps[ *i ].size() );
         modules_by_weight[ w ].insert( *i );
     }
 
@@ -1512,7 +1512,7 @@ static void output_module_weight_report( module_weight_actions & actions )
 
                 for( std::set< std::string >::const_iterator k = s_module_deps[ *j ].begin(); k != s_module_deps[ *j ].end(); ++k )
                 {
-                    int w = s_module_deps[ *k ].size() + secondary_deps[ *k ].size();
+                    int w = static_cast<int>( s_module_deps[ *k ].size() + secondary_deps[ *k ].size() );
                     actions.module_primary( *k, w );
                 }
 
@@ -1525,7 +1525,7 @@ static void output_module_weight_report( module_weight_actions & actions )
 
                 for( std::set< std::string >::const_iterator k = secondary_deps[ *j ].begin(); k != secondary_deps[ *j ].end(); ++k )
                 {
-                    int w = s_module_deps[ *k ].size() + secondary_deps[ *k ].size();
+                    int w = static_cast<int>( s_module_deps[ *k ].size() + secondary_deps[ *k ].size() );
                     actions.module_secondary( *k, w );
                 }
 
