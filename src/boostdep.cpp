@@ -29,7 +29,8 @@ namespace fs = boost::filesystem;
 enum output_format
 {
    txt_output = 0,
-   html_output = 1
+   html_output = 1,
+   csv_output = 2
 };
 
 // header -> module
@@ -39,6 +40,13 @@ static std::map< std::string, std::string > s_header_map;
 static std::map< std::string, std::set<std::string> > s_module_headers;
 
 static std::set< std::string > s_modules;
+
+// csv options
+static std::string s_csv_separator = ",";
+
+static bool s_csv_table_marker = true;
+
+static bool s_csv_table_header = true;
 
 static void scan_module_headers( fs::path const & path )
 {
@@ -603,11 +611,69 @@ struct module_primary_html_actions: public module_primary_actions
     }
 };
 
+struct module_primary_csv_actions: public module_primary_actions
+{
+    bool first_header_;
+    std::string module_;
+
+    void heading( std::string const & module )
+    {
+        if( s_csv_table_marker )
+            std::cout << "[Primary]" << s_csv_separator << module << "\n";
+        if( s_csv_table_header )
+            std::cout << "Module" << s_csv_separator << "Header" << s_csv_separator << "From" << "\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
+         std::cout << "\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+         module_ = module;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void header_start( std::string const & header )
+    {
+        std::cout << module_ << s_csv_separator << header << s_csv_separator;
+        first_header_ = true;
+    }
+
+    void header_end( std::string const & /*header*/ )
+    {
+         std::cout << "\n";
+    }
+
+    void from_header( std::string const & header )
+    {
+        if( first_header_ )
+        {
+            first_header_ = false;
+        }
+        else
+        {       
+            std::cout << ' ';
+        }
+       
+        std::cout << header;
+    }
+};
+
 static void output_module_primary_report( std::string const & module, output_format out_fmt, bool track_sources, bool track_tests )
 {
     if( out_fmt == html_output )
     {
         module_primary_html_actions actions;
+        output_module_primary_report( module, actions, track_sources, track_tests );
+    }
+    else if( out_fmt == csv_output )
+    {
+        module_primary_csv_actions actions;
         output_module_primary_report( module, actions, track_sources, track_tests );
     }
     else
@@ -676,11 +742,48 @@ struct module_secondary_html_actions: public module_secondary_actions
     }
 };
 
+struct module_secondary_csv_actions: public module_secondary_actions
+{
+    std::string secondary_;
+
+    void heading( std::string const & module )
+    {
+        if( s_csv_table_marker )
+            std::cout << "[Secondary]" << s_csv_separator << module << "\n";
+        if( s_csv_table_header )
+            std::cout << "Module" << s_csv_separator << "Adds\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
+         std::cout << "\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+         secondary_ = module;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void module_adds( std::string const & module )
+    {
+        std::cout << secondary_ << s_csv_separator << module << "\n";
+    }
+};
+
 static void output_module_secondary_report( std::string const & module, output_format out_fmt )
 {
     if( out_fmt == html_output )
     {
         module_secondary_html_actions actions;
+        output_module_secondary_report( module, actions );
+    }
+    else if( out_fmt == csv_output )
+    {
+        module_secondary_csv_actions actions;
         output_module_secondary_report( module, actions );
     }
     else
@@ -746,11 +849,59 @@ struct header_inclusion_html_actions: public header_inclusion_actions
     }
 };
 
+struct header_inclusion_csv_actions: public header_inclusion_actions
+{
+    bool first_header;
+
+    void heading( std::string const & header, std::string const & module )
+    {
+        if( s_csv_table_marker )
+            std::cout << "[Header]" << s_csv_separator << header << s_csv_separator << module << "\n";
+        if( s_csv_table_header )
+            std::cout << "Module" << s_csv_separator << "From\n";
+    }
+
+    void footer( std::string const & /*header*/, std::string const & /*module */ )
+    { 
+        std::cout << "\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+        std::cout << module << s_csv_separator;
+        first_header = true;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+        std::cout << '\n';
+    }
+
+    void header( std::string const & header )
+    {
+        if( first_header )
+        {
+            first_header = false;
+        }
+        else
+        {
+            std::cout << ' ';
+        }
+       
+        std::cout << header;
+    }
+};
+
 static void output_header_report( std::string const & header, output_format out_fmt )
 {
     if( out_fmt == html_output )
     {
         header_inclusion_html_actions actions;
+        output_header_inclusion_report( header, actions );
+    }
+    else if( out_fmt == csv_output )
+    {
+        header_inclusion_csv_actions actions;
         output_header_inclusion_report( header, actions );
     }
     else
@@ -892,11 +1043,64 @@ struct module_reverse_html_actions: public module_reverse_actions
     }
 };
 
+struct module_reverse_csv_actions: public module_reverse_actions
+{
+    std::string module_;
+    bool first_header_;
+
+    void heading( std::string const & module )
+    {
+        if( s_csv_table_marker )
+            std::cout << "[Reverse]" << s_csv_separator << module << "\n";
+        if( s_csv_table_header )
+            std::cout << "Module" << s_csv_separator << "Header" << s_csv_separator << "From" << "\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
+        std::cout << "\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+        module_ = module;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void header_start( std::string const & header )
+    {
+        std::cout << module_ << s_csv_separator << header << s_csv_separator;
+        first_header_ = true;
+    }
+
+    void header_end( std::string const & /*header*/ )
+    {
+        std::cout << '\n';
+    }
+
+    void from_header( std::string const & header )
+    {
+        if( first_header_ )
+            first_header_ = false;
+        else
+            std::cout << ' ';
+        std::cout << header;
+    }
+};
+
 static void output_module_reverse_report( std::string const & module, output_format out_fmt )
 {
     if( out_fmt == html_output )
     {
         module_reverse_html_actions actions;
+        output_module_reverse_report( module, actions );
+    }
+    else if( out_fmt == csv_output )
+    {
+        module_reverse_csv_actions actions;
         output_module_reverse_report( module, actions );
     }
     else
@@ -1245,11 +1449,78 @@ struct module_level_html_actions: public module_level_actions
     }
 };
 
+struct module_level_csv_actions: public module_level_actions
+{
+    int level_;
+    bool module2_start_;
+
+    void begin()
+    {
+        if( s_csv_table_marker )
+            std::cout << "[Levels]\n";
+        if( s_csv_table_header )
+            std::cout << "Level" << s_csv_separator << "Module" << s_csv_separator << "Dependencies" << "\n";
+    }
+
+    void end()
+    {
+        std::cout << '\n';
+    }
+
+    void level_start( int level )
+    {
+        level_ = level;
+    }
+
+    void level_end( int /*level*/ )
+    {
+    }
+
+    void module_start( std::string const & module )
+    {
+        if( level_ == unknown_level )
+            std::cout << "unknown_level";
+        else
+            std::cout << level_;
+        std::cout << s_csv_separator << module << s_csv_separator;;
+        module2_start_ = true;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+        std::cout << '\n';
+    }
+
+    void module2( std::string const & module, int level )
+    {
+        if( module2_start_ )
+        {
+            module2_start_ = false;
+        }
+        else
+        {
+            std::cout << " ";
+        }
+
+        std::cout << module;
+
+        if( level < unknown_level )
+        {
+            std::cout << "(" << level << ")";
+        }
+    }
+};
+
 static void output_module_level_report( output_format out_fmt )
 {
     if( out_fmt == html_output )
     {
         module_level_html_actions actions;
+        output_module_level_report( actions );
+    }
+    else if( out_fmt == csv_output )
+    {
+        module_level_csv_actions actions;
         output_module_level_report( actions );
     }
     else
@@ -1357,11 +1628,54 @@ struct module_overview_html_actions: public module_overview_actions
     }
 };
 
+struct module_overview_csv_actions: public module_overview_actions
+{
+    bool first_module_;
+
+    void begin()
+    {
+        if( s_csv_table_marker )
+            std::cout << "[Overview]\n";
+        if( s_csv_table_header )
+            std::cout << "Module" << s_csv_separator << "Dependencies" << "\n";
+    }
+
+    void end()
+    {
+        std::cout << "\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+        std::cout << module << s_csv_separator;
+        first_module_ = true;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+        std::cout << "\n";
+    }
+
+    void module2( std::string const & module )
+    {
+        if( first_module_ )
+            first_module_ = false;
+        else
+            std::cout << " ";
+        std::cout << module;
+    }
+};
+
 static void output_module_overview_report( output_format out_fmt )
 {
     if( out_fmt == html_output )
     {
         module_overview_html_actions actions;
+        output_module_overview_report( actions );
+    }
+    else if( out_fmt == csv_output )
+    {
+        module_overview_csv_actions actions;
         output_module_overview_report( actions );
     }
     else
@@ -1738,11 +2052,102 @@ struct module_weight_html_actions: public module_weight_actions
     }
 };
 
+struct module_weight_csv_actions: public module_weight_actions
+{
+    int weight_;
+    bool primary_start_;
+    bool secondary_start_;
+
+    void begin()
+    {
+        if( s_csv_table_marker )
+            std::cout << "[Weights]\n";
+        if( s_csv_table_header )
+            std::cout << "Weight" << s_csv_separator << "Module" << s_csv_separator << "Primary" << s_csv_separator << "Secondary" << "\n";
+    }
+
+    void end()
+    {
+        std::cout << '\n';
+    }
+
+    void weight_start( int weight )
+    {
+        weight_ = weight;
+    }
+
+    void weight_end( int /*weight*/ )
+    {
+    }
+
+    void module_start( std::string const & module )
+    {
+        std::cout << weight_ << s_csv_separator << module << s_csv_separator;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+        std::cout << "\n";
+    }
+
+    void module_primary_start()
+    {
+        primary_start_ = true;
+    }
+
+    void module_primary( std::string const & module, int weight )
+    {
+        if( primary_start_ )
+        {
+            primary_start_ = false;
+        }
+        else
+        {
+            std::cout << " ";
+        }
+
+        std::cout << module << "(" << weight << ")";
+    }
+
+    void module_primary_end()
+    {
+        std::cout << s_csv_separator;
+    }
+
+    void module_secondary_start()
+    {
+        secondary_start_ = true;
+    }
+
+    void module_secondary( std::string const & module, int weight )
+    {
+        if( secondary_start_ )
+        {
+            secondary_start_ = false;
+        }
+        else
+        {
+            std::cout << " ";
+        }
+
+        std::cout << module << "(" << weight << ")";
+    }
+
+    void module_secondary_end()
+    {
+    }
+};
+
 static void output_module_weight_report( output_format out_fmt )
 {
     if( out_fmt == html_output )
     {
         module_weight_html_actions actions;
+        output_module_weight_report( actions );
+    }
+    else if( out_fmt == csv_output )
+    {
+        module_weight_csv_actions actions;
         output_module_weight_report( actions );
     }
     else
@@ -1982,11 +2387,58 @@ struct module_subset_html_actions: public module_subset_actions
     }
 };
 
+struct module_subset_csv_actions: public module_subset_actions
+{
+    std::string module_;
+
+    void heading( std::string const & module )
+    {
+        if( s_csv_table_marker )
+            std::cout << "[Subset]" << s_csv_separator << module << "\n";
+        if( s_csv_table_header )
+            std::cout << "Module" << s_csv_separator << "Path\n";
+    }
+
+    void footer( std::string const & /*module */ )
+    {
+        std::cout << "\n";
+    }
+
+    void module_start( std::string const & module )
+    {
+        module_ = module;
+    }
+
+    void module_end( std::string const & /*module*/ )
+    {
+    }
+
+    void from_path( std::vector<std::string> const & path )
+    {
+        std::cout << module_ << s_csv_separator;
+
+        for( std::vector<std::string>::const_iterator i = path.begin(); i != path.end(); ++i )
+        {
+            if( i != path.begin() )
+            {
+                std::cout << " -> ";
+            }
+            std::cout << *i;
+        }
+        std::cout << "\n";
+    }
+};
+
 static void output_module_subset_report( std::string const & module, bool track_sources, bool track_tests, output_format out_fmt )
 {
     if( out_fmt == html_output )
     {
         module_subset_html_actions actions;
+        output_module_subset_report( module, track_sources, track_tests, actions );
+    }
+    else if( out_fmt == csv_output )
+    {
+        module_subset_csv_actions actions;
         output_module_subset_report( module, track_sources, track_tests, actions );
     }
     else
@@ -2729,6 +3181,11 @@ static void output_directory_subset_report( std::string const & module, std::set
         module_subset_html_actions actions;
         output_module_subset_report_( module, headers, actions );
     }
+    else if( out_fmt == csv_output )
+    {
+        module_subset_csv_actions actions;
+        output_module_subset_report_( module, headers, actions );
+    }
     else
     {
         module_subset_txt_actions actions;
@@ -2936,7 +3393,12 @@ int main( int argc, char const* argv[] )
             "               [--[no-]track-sources] [--[no-]track-tests]\n"
             "               [--html-title <title>] [--html-footer <footer>]\n"
             "               [--html-stylesheet <stylesheet>] [--html-prefix <prefix>]\n"
-            "               [--html]\n";
+            "               [--html]\n"
+            "               [--csv]\n"
+            "               [--csv-separator <separator>]\n"
+            "               [--csv-[no-]table-marker]\n"
+            "               [--csv-[no-]table-header]\n"
+            ;
 
         return -1;
     }
@@ -3062,6 +3524,36 @@ int main( int argc, char const* argv[] )
                 out_fmt = html_output;
                 output_html_header( html_title, html_stylesheet, html_prefix );
             }
+        }
+        else if( option == "--csv" )
+        {
+            if( out_fmt != csv_output )
+            {
+                out_fmt = csv_output;
+            }
+        }
+        else if( option == "--csv-separator" )
+        {
+            if( i + 1 < argc )
+            {
+                s_csv_separator = argv[ ++i ];
+            }
+        }
+        else if( option == "--csv-table-marker" )
+        {
+            s_csv_table_marker = true;
+        }
+        else if( option == "--csv-no-table-marker" )
+        {
+            s_csv_table_marker = false;
+        }
+        else if( option == "--csv-table-header" )
+        {
+            s_csv_table_header = true;
+        }
+        else if( option == "--csv-no-table-header" )
+        {
+            s_csv_table_header = false;
         }
         else if( option == "--track-sources" )
         {
