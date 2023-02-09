@@ -258,6 +258,10 @@ Usage:
                \[--html-title <title>\] \[--html-footer <footer>\]
                \[--html-stylesheet <stylesheet>\] \[--html-prefix <prefix>\]
                \[--html\]
+               \[--csv\]
+               \[--csv-separator <separator>\]
+               \[--csv-[no-]table-marker\]
+               \[--csv-[no-]table-header\]
 ]
 
 [endsect]
@@ -777,6 +781,111 @@ the =test= subdirectory is not scanned.
 [section --html]
 
 =--html= switches to HTML output mode (the default is plain text). It must precede the commands that generate output.
+
+[endsect]
+
+[section --csv]
+
+=--csv= switches to CSV output mode (the default is plain text). It must precede the commands that generate output.
+It supports the same operations supported by =--html= (=--module-overview=, =--module-levels=...).
+By default, each operation will create a table prefixed by a table marker that describes the operation and a header
+describing column names. For instance, the following command:
+
+[pre
+dist/bin/boostdep --csv --primary assert --secondary container_hash --header boost/container/deque.hpp --reverse interprocess --subset assert
+]
+
+can output:
+
+[pre
+
+[Primary],assert
+Module,Header,From
+config,boost/config.hpp,boost/assert.hpp boost/assert/source_location.hpp
+config,boost/config/workaround.hpp,boost/assert/source_location.hpp
+config,boost/cstdint.hpp,boost/assert/source_location.hpp
+
+[Secondary],container_hash
+Module,Adds
+type_traits,static_assert
+
+[Header],boost/container/deque.hpp,container
+Module,From
+interprocess,boost/interprocess/containers/deque.hpp
+thread,boost/thread/csbl/deque.hpp
+
+[Reverse],interprocess
+Module,Header,From
+flyweight,boost/interprocess/detail/intermodule_singleton.hpp,boost/flyweight/intermodule_holder.hpp
+log,boost/interprocess/creation_tags.hpp,libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/detail/workaround.hpp,libs/log/src/posix/ipc_sync_wrappers.hpp
+log,boost/interprocess/exceptions.hpp,libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/mapped_region.hpp,libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/permissions.hpp,libs/log/src/permissions.cpp libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/shared_memory_object.hpp,libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/sync/interprocess_condition.hpp,libs/log/src/posix/ipc_sync_wrappers.hpp
+log,boost/interprocess/sync/interprocess_mutex.hpp,libs/log/src/posix/ipc_sync_wrappers.hpp
+
+[Subset],assert
+Module,Path
+config,boost/assert.hpp -> boost/config.hpp
+config,boost/assert/source_location.hpp -> boost/config.hpp
+
+]
+
+[endsect]
+
+[section --csv-separator]
+
+[^--csv-separator /separator/] sets the CSV column separator string. The default separator is the comma character (','). It has no effect if =--csv= is not given.
+The following command will create a CSV file using semicolon (';') as the separator:
+
+[pre
+dist/bin/boostdep --csv --csv-separator ';' --primary assert
+]
+
+[endsect]
+
+[section --csv-table-marker]
+
+=--csv-table-marker= activates a marker line for each table that is created in the CSV file in the form `[Operation] <csv-separator> <arg>`.
+It's activated by default. This allows the detection of each operation, which creates its own table in the CSV file.
+If =--csv-no-table-marker= is given the marker line is not emitted. It has no effect if =--csv= is not given. The following command
+
+[pre
+dist/bin/boostdep --csv --csv-no-table-marker --csv-no-table-header --primary assert
+]
+
+will output a standard CSV file with no `[Primary],assert` marker line:
+
+[pre
+Module,Header,From
+config,boost/config.hpp,boost/assert.hpp boost/assert/source_location.hpp
+config,boost/config/workaround.hpp,boost/assert/source_location.hpp
+config,boost/cstdint.hpp,boost/assert/source_location.hpp
+]
+
+[endsect]
+
+[section --csv-table-header]
+
+=--csv-table-header= activates a header line describing each column of each table that is created in the CSV file. 
+It's activated by default. This allows easier identification of the column meaning and easier import to a database. 
+If =--csv-no-table-marker= is given the marker line is not emitted. It has no effect if =--csv= is not given.
+The following command
+
+[pre
+dist/bin/boostdep --csv --csv-no-table-header --primary assert
+]
+
+will output a standard CSV file with no `Module,Header,From` header line
+
+[pre
+[Primary],assert
+config,boost/config.hpp,boost/assert.hpp boost/assert/source_location.hpp
+config,boost/config/workaround.hpp,boost/assert/source_location.hpp
+config,boost/cstdint.hpp,boost/assert/source_location.hpp
+]
 
 [endsect]
 
