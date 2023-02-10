@@ -47,6 +47,10 @@ jobs:
             cxxstd: "03,11,14,17,2a"
             os: ubuntu-20.04
             install: g++-11
+          - toolset: gcc-12
+            cxxstd: "03,11,14,17,20,2b"
+            os: ubuntu-22.04
+            install: g++-12
           - toolset: clang
             compiler: clang++-3.9
             cxxstd: "03,11,14"
@@ -98,13 +102,26 @@ jobs:
             os: ubuntu-20.04
             install: clang-12
           - toolset: clang
+            compiler: clang++-13
+            cxxstd: "03,11,14,17,20,2b"
+            os: ubuntu-22.04
+            install: clang-13
+          - toolset: clang
+            compiler: clang++-14
+            cxxstd: "03,11,14,17,20,2b"
+            os: ubuntu-22.04
+            install: clang-14
+          - toolset: clang
             cxxstd: "03,11,14,17,2a"
-            os: macos-10.15
+            os: macos-11
+          - toolset: clang
+            cxxstd: "03,11,14,17,20,2b"
+            os: macos-12
 
     runs-on: ${{matrix.os}}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install packages
         if: matrix.install
@@ -168,7 +185,7 @@ jobs:
     runs-on: ${{matrix.os}}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Boost
         shell: cmd
@@ -200,7 +217,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Boost
         run: |
@@ -230,7 +247,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install packages
         run: sudo apt-get install libboost-filesystem-dev
@@ -246,7 +263,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Boost
         run: |
