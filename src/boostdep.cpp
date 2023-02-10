@@ -182,7 +182,7 @@ static void scan_header_dependencies( std::string const & header, std::istream &
 struct module_primary_actions
 {
     virtual void heading( std::string const & module ) = 0;
-    virtual void footer( std::string const & module )    = 0;
+    virtual void footer( std::string const & module ) = 0;
 
     virtual void module_start( std::string const & module ) = 0;
     virtual void module_end( std::string const & module ) = 0;
@@ -386,7 +386,7 @@ static void output_module_primary_report( std::string const & module, module_pri
 struct module_secondary_actions
 {
     virtual void heading( std::string const & module ) = 0;
-    virtual void footer( std::string const & module )    = 0;
+    virtual void footer( std::string const & module ) = 0;
 
     virtual void module_start( std::string const & module ) = 0;
     virtual void module_end( std::string const & module ) = 0;
