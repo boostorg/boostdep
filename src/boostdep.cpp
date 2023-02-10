@@ -28,9 +28,9 @@ namespace fs = boost::filesystem;
 
 enum output_format
 {
-   txt_output = 0,
-   html_output = 1,
-   csv_output = 2
+    output_format_txt = 0,
+    output_format_html,
+    output_format_csv
 };
 
 // header -> module
@@ -666,12 +666,12 @@ struct module_primary_csv_actions: public module_primary_actions
 
 static void output_module_primary_report( std::string const & module, output_format out_fmt, bool track_sources, bool track_tests )
 {
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         module_primary_html_actions actions;
         output_module_primary_report( module, actions, track_sources, track_tests );
     }
-    else if( out_fmt == csv_output )
+    else if( out_fmt == output_format_csv )
     {
         module_primary_csv_actions actions;
         output_module_primary_report( module, actions, track_sources, track_tests );
@@ -776,12 +776,12 @@ struct module_secondary_csv_actions: public module_secondary_actions
 
 static void output_module_secondary_report( std::string const & module, output_format out_fmt )
 {
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         module_secondary_html_actions actions;
         output_module_secondary_report( module, actions );
     }
-    else if( out_fmt == csv_output )
+    else if( out_fmt == output_format_csv )
     {
         module_secondary_csv_actions actions;
         output_module_secondary_report( module, actions );
@@ -894,12 +894,12 @@ struct header_inclusion_csv_actions: public header_inclusion_actions
 
 static void output_header_report( std::string const & header, output_format out_fmt )
 {
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         header_inclusion_html_actions actions;
         output_header_inclusion_report( header, actions );
     }
-    else if( out_fmt == csv_output )
+    else if( out_fmt == output_format_csv )
     {
         header_inclusion_csv_actions actions;
         output_header_inclusion_report( header, actions );
@@ -1093,12 +1093,12 @@ struct module_reverse_csv_actions: public module_reverse_actions
 
 static void output_module_reverse_report( std::string const & module, output_format out_fmt )
 {
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         module_reverse_html_actions actions;
         output_module_reverse_report( module, actions );
     }
-    else if( out_fmt == csv_output )
+    else if( out_fmt == output_format_csv )
     {
         module_reverse_csv_actions actions;
         output_module_reverse_report( module, actions );
@@ -1513,12 +1513,12 @@ struct module_level_csv_actions: public module_level_actions
 
 static void output_module_level_report( output_format out_fmt )
 {
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         module_level_html_actions actions;
         output_module_level_report( actions );
     }
-    else if( out_fmt == csv_output )
+    else if( out_fmt == output_format_csv )
     {
         module_level_csv_actions actions;
         output_module_level_report( actions );
@@ -1668,12 +1668,12 @@ struct module_overview_csv_actions: public module_overview_actions
 
 static void output_module_overview_report( output_format out_fmt )
 {
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         module_overview_html_actions actions;
         output_module_overview_report( actions );
     }
-    else if( out_fmt == csv_output )
+    else if( out_fmt == output_format_csv )
     {
         module_overview_csv_actions actions;
         output_module_overview_report( actions );
@@ -2140,12 +2140,12 @@ struct module_weight_csv_actions: public module_weight_actions
 
 static void output_module_weight_report( output_format out_fmt )
 {
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         module_weight_html_actions actions;
         output_module_weight_report( actions );
     }
-    else if( out_fmt == csv_output )
+    else if( out_fmt == output_format_csv )
     {
         module_weight_csv_actions actions;
         output_module_weight_report( actions );
@@ -2431,12 +2431,12 @@ struct module_subset_csv_actions: public module_subset_actions
 
 static void output_module_subset_report( std::string const & module, bool track_sources, bool track_tests, output_format out_fmt )
 {
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         module_subset_html_actions actions;
         output_module_subset_report( module, track_sources, track_tests, actions );
     }
-    else if( out_fmt == csv_output )
+    else if( out_fmt == output_format_csv )
     {
         module_subset_csv_actions actions;
         output_module_subset_report( module, track_sources, track_tests, actions );
@@ -3176,12 +3176,12 @@ static void output_directory_subset_report( std::string const & module, std::set
         }
     }
 
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         module_subset_html_actions actions;
         output_module_subset_report_( module, headers, actions );
     }
-    else if( out_fmt == csv_output )
+    else if( out_fmt == output_format_csv )
     {
         module_subset_csv_actions actions;
         output_module_subset_report_( module, headers, actions );
@@ -3458,7 +3458,7 @@ int main( int argc, char const* argv[] )
         std::cerr << x.what() << std::endl;
     }
 
-    output_format out_fmt = txt_output;
+    output_format out_fmt = output_format_txt;
     bool secondary = false;
     bool track_sources = true;
     bool track_tests = false;
@@ -3519,17 +3519,17 @@ int main( int argc, char const* argv[] )
         }
         else if( option == "--html" )
         {
-            if( out_fmt != html_output )
+            if( out_fmt != output_format_html )
             {
-                out_fmt = html_output;
+                out_fmt = output_format_html;
                 output_html_header( html_title, html_stylesheet, html_prefix );
             }
         }
         else if( option == "--csv" )
         {
-            if( out_fmt != csv_output )
+            if( out_fmt != output_format_csv )
             {
-                out_fmt = csv_output;
+                out_fmt = output_format_csv;
             }
         }
         else if( option == "--csv-separator" )
@@ -3753,7 +3753,7 @@ int main( int argc, char const* argv[] )
         }
     }
 
-    if( out_fmt == html_output )
+    if( out_fmt == output_format_html )
     {
         output_html_footer( html_footer );
     }
