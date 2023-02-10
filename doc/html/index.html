@@ -75,6 +75,10 @@
 <dt><span class="section"><a href="index.html#boostdep.reference.html_stylesheet">--html-stylesheet</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html_prefix">--html-prefix</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html">--html</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.csv">--csv</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.csv_separator">--csv-separator</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.csv_table_marker">--csv-table-marker</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.csv_table_header">--csv-table-header</a></span></dt>
 </dl></dd>
 </dl>
 </div>
@@ -348,6 +352,10 @@ nothing added to commit but untracked files present (use "git add" to track)
                [--html-title &lt;title&gt;] [--html-footer &lt;footer&gt;]
                [--html-stylesheet &lt;stylesheet&gt;] [--html-prefix &lt;prefix&gt;]
                [--html]
+               [--csv]
+               [--csv-separator &lt;separator&gt;]
+               [--csv-[no-]table-marker]
+               [--csv-[no-]table-header]
 </pre>
 </div>
 </div>
@@ -614,6 +622,10 @@ FOR /f %%i IN (%OUTDIR%\list-modules.txt) DO %BOOSTDEP% --html-title "Dependency
 <dt><span class="section"><a href="index.html#boostdep.reference.html_stylesheet">--html-stylesheet</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html_prefix">--html-prefix</a></span></dt>
 <dt><span class="section"><a href="index.html#boostdep.reference.html">--html</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.csv">--csv</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.csv_separator">--csv-separator</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.csv_table_marker">--csv-table-marker</a></span></dt>
+<dt><span class="section"><a href="index.html#boostdep.reference.csv_table_header">--csv-table-header</a></span></dt>
 </dl></div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
@@ -1010,10 +1022,122 @@ align -&gt; assert config core static_assert throw_exception
         text). It must precede the commands that generate output.
       </p>
 </div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.csv"></a><a class="link" href="index.html#boostdep.reference.csv" title="--csv">--csv</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">--csv</code> switches to CSV output mode (the default is plain
+        text). It must precede the commands that generate output. It supports the
+        same operations supported by <code class="literal">--html</code> (<code class="literal">--module-overview</code>,
+        <code class="literal">--module-levels</code>...). By default, each operation will create
+        a table prefixed by a table marker that describes the operation and a header
+        describing column names. For instance, the following command:
+      </p>
+<pre class="programlisting">dist/bin/boostdep --csv --primary assert --secondary container_hash --header boost/container/deque.hpp --reverse interprocess --subset assert
+</pre>
+<p>
+        can output:
+      </p>
+<pre class="programlisting">
+[Primary],assert
+Module,Header,From
+config,boost/config.hpp,boost/assert.hpp boost/assert/source_location.hpp
+config,boost/config/workaround.hpp,boost/assert/source_location.hpp
+config,boost/cstdint.hpp,boost/assert/source_location.hpp
+
+[Secondary],container_hash
+Module,Adds
+type_traits,static_assert
+
+[Header],boost/container/deque.hpp,container
+Module,From
+interprocess,boost/interprocess/containers/deque.hpp
+thread,boost/thread/csbl/deque.hpp
+
+[Reverse],interprocess
+Module,Header,From
+flyweight,boost/interprocess/detail/intermodule_singleton.hpp,boost/flyweight/intermodule_holder.hpp
+log,boost/interprocess/creation_tags.hpp,libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/detail/workaround.hpp,libs/log/src/posix/ipc_sync_wrappers.hpp
+log,boost/interprocess/exceptions.hpp,libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/mapped_region.hpp,libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/permissions.hpp,libs/log/src/permissions.cpp libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/shared_memory_object.hpp,libs/log/src/posix/ipc_reliable_message_queue.cpp
+log,boost/interprocess/sync/interprocess_condition.hpp,libs/log/src/posix/ipc_sync_wrappers.hpp
+log,boost/interprocess/sync/interprocess_mutex.hpp,libs/log/src/posix/ipc_sync_wrappers.hpp
+
+[Subset],assert
+Module,Path
+config,boost/assert.hpp -&gt; boost/config.hpp
+config,boost/assert/source_location.hpp -&gt; boost/config.hpp
+
+</pre>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.csv_separator"></a><a class="link" href="index.html#boostdep.reference.csv_separator" title="--csv-separator">--csv-separator</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">--csv-separator <span class="emphasis"><em>separator</em></span></code> sets the
+        CSV column separator string. The default separator is the comma character
+        (','). It has no effect if <code class="literal">--csv</code> is not given. The following
+        command will create a CSV file using semicolon (';') as the separator:
+      </p>
+<pre class="programlisting">dist/bin/boostdep --csv --csv-separator ';' --primary assert
+</pre>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.csv_table_marker"></a><a class="link" href="index.html#boostdep.reference.csv_table_marker" title="--csv-table-marker">--csv-table-marker</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">--csv-table-marker</code> activates a marker line for each table
+        that is created in the CSV file in the form <code class="computeroutput"><span class="special">[</span><span class="identifier">Operation</span><span class="special">]</span> <span class="special">&lt;</span><span class="identifier">csv</span><span class="special">-</span><span class="identifier">separator</span><span class="special">&gt;</span> <span class="special">&lt;</span><span class="identifier">arg</span><span class="special">&gt;</span></code>.
+        It's activated by default. This allows the detection of each operation, which
+        creates its own table in the CSV file. If <code class="literal">--csv-no-table-marker</code>
+        is given the marker line is not emitted. It has no effect if <code class="literal">--csv</code>
+        is not given. The following command
+      </p>
+<pre class="programlisting">dist/bin/boostdep --csv --csv-no-table-marker --csv-no-table-header --primary assert
+</pre>
+<p>
+        will output a standard CSV file with no <code class="computeroutput"><span class="special">[</span><span class="identifier">Primary</span><span class="special">],</span><span class="identifier">assert</span></code> marker line:
+      </p>
+<pre class="programlisting">Module,Header,From
+config,boost/config.hpp,boost/assert.hpp boost/assert/source_location.hpp
+config,boost/config/workaround.hpp,boost/assert/source_location.hpp
+config,boost/cstdint.hpp,boost/assert/source_location.hpp
+</pre>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boostdep.reference.csv_table_header"></a><a class="link" href="index.html#boostdep.reference.csv_table_header" title="--csv-table-header">--csv-table-header</a>
+</h3></div></div></div>
+<p>
+        <code class="literal">--csv-table-header</code> activates a header line describing
+        each column of each table that is created in the CSV file. It's activated
+        by default. This allows easier identification of the column meaning and easier
+        import to a database. If <code class="literal">--csv-no-table-marker</code> is given
+        the marker line is not emitted. It has no effect if <code class="literal">--csv</code>
+        is not given. The following command
+      </p>
+<pre class="programlisting">dist/bin/boostdep --csv --csv-no-table-header --primary assert
+</pre>
+<p>
+        will output a standard CSV file with no <code class="computeroutput"><span class="identifier">Module</span><span class="special">,</span><span class="identifier">Header</span><span class="special">,</span><span class="identifier">From</span></code> header
+        line
+      </p>
+<pre class="programlisting">[Primary],assert
+config,boost/config.hpp,boost/assert.hpp boost/assert/source_location.hpp
+config,boost/config/workaround.hpp,boost/assert/source_location.hpp
+config,boost/cstdint.hpp,boost/assert/source_location.hpp
+</pre>
+</div>
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: June 11, 2021 at 17:53:49 GMT</small></p></td>
+<td align="left"><p><small>Last revised: February 10, 2023 at 16:14:02 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
