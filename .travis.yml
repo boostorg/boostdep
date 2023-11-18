@@ -145,6 +145,23 @@ matrix:
         apt:
           packages:
             - libboost-filesystem-dev
+            - g++-8
+          sources:
+            - ubuntu-toolchain-r-test
+      install: true
+      script:
+        - export CC=gcc-8 && export CXX=g++-8
+        - mkdir __build__ && cd __build__
+        - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~ ..
+        - cmake --build . --target install
+
+    - os: linux
+      compiler: g++
+      env: CMAKE=1
+      addons:
+        apt:
+          packages:
+            - libboost-filesystem-dev
       install: true
       script:
         - mkdir __build__ && cd __build__

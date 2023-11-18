@@ -9,8 +9,6 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -24,7 +22,18 @@
 #include <sstream>
 #include <cctype>
 
-namespace fs = boost::filesystem;
+#ifdef BOOSTDEP_USE_STD_FS
+    #include <filesystem>
+    namespace fs = std::filesystem;
+    typedef std::ifstream ifstream_t;
+#else
+    #include <boost/filesystem.hpp>
+    #include <boost/filesystem/fstream.hpp>
+    namespace fs = boost::filesystem;
+    typedef fs::ifstream ifstream_t;
+#endif
+
+
 
 enum output_format
 {
@@ -65,7 +74,7 @@ static void scan_module_headers( fs::path const & path )
 
         for( ; it != last; ++it )
         {
-            if( it->status().type() == fs::directory_file )
+            if( fs::is_directory( it->status() ) )
             {
                 continue;
             }
@@ -91,7 +100,7 @@ static void scan_submodules( fs::path const & path )
     {
         fs::directory_entry const & e = *it;
 
-        if( e.status().type() != fs::directory_file )
+        if( !fs::is_directory( it->status() ) )
         {
             continue;
         }
@@ -233,7 +242,7 @@ static void scan_module_path( fs::path const & dir, bool remove_prefix, std::map
 
         for( ; it != last; ++it )
         {
-            if( it->status().type() == fs::directory_file )
+            if( fs::is_directory( it->status() ) )
             {
                 continue;
             }
@@ -245,7 +254,7 @@ static void scan_module_path( fs::path const & dir, bool remove_prefix, std::map
                 header = header.substr( n+1 );
             }
 
-            fs::ifstream is( it->path() );
+            ifstream_t is( it->path() );
 
             scan_header_dependencies( header, is, deps, from );
         }
@@ -2178,7 +2187,7 @@ static void add_module_headers( fs::path const & dir, std::set<std::string> & he
 
         for( ; it != last; ++it )
         {
-            if( it->status().type() == fs::directory_file )
+            if( fs::is_directory( it->status() ) )
             {
                 continue;
             }
