@@ -339,7 +339,7 @@ jobs:
           rm -rf tools/boostdep/*
           cp -r $GITHUB_WORKSPACE/* tools/boostdep
           ./bootstrap.sh
-          ./b2 tools/boostdep/build
+          ./b2 tools/boostdep/build link=static
 
       - name: Check exceptions
         run: |
