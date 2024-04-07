@@ -7,6 +7,7 @@ on:
       - master
       - develop
       - feature/**
+      - modular
 
 env:
   UBSAN_OPTIONS: print_stacktrace=1
@@ -182,10 +183,12 @@ jobs:
           REF=${GITHUB_BASE_REF:-$GITHUB_REF}
           REF=${REF#refs/heads/}
           echo REF: $REF
-          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          BOOST_BRANCH=develop && ( test "${GITHUB_REF_NAME}" == "master" || test "${GITHUB_REF_NAME}" == "modular" ) && BOOST_BRANCH=${GITHUB_REF_NAME} || true
+          BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boostdep/boost}.git
+          echo BOOST_GIT: ${BOOST_GIT}
           echo BOOST_BRANCH: $BOOST_BRANCH
           cd ..
-          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          git clone -b "${BOOST_BRANCH}" --depth 1 "${BOOST_GIT}" boost-root
           cd boost-root
           git submodule update --init libs/assert libs/bind
           cp -r $GITHUB_WORKSPACE/* tools/boostdep
@@ -243,9 +246,12 @@ jobs:
           if "%GITHUB_BASE_REF%" == "" set GITHUB_BASE_REF=%GITHUB_REF%
           set BOOST_BRANCH=develop
           for /f %%i in ("%GITHUB_BASE_REF%") do if "%%~nxi" == "master" set BOOST_BRANCH=master
+          for /f %%i in ("%GITHUB_BASE_REF%") do if "%%~nxi" == "modular" set BOOST_BRANCH=modular
+          set BOOST_GIT=https://github.com/%GITHUB_REPOSITORY:boostdep=boost%.git
+          echo BOOST_GIT: %BOOST_GIT%
           echo BOOST_BRANCH: %BOOST_BRANCH%
           cd ..
-          git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
+          git clone -b %BOOST_BRANCH% --depth 1 %BOOST_GIT% boost-root
           cd boost-root
           git submodule update --init libs/assert libs/bind
           xcopy /s /e /q %GITHUB_WORKSPACE% tools\boostdep\
@@ -274,10 +280,12 @@ jobs:
           REF=${GITHUB_BASE_REF:-$GITHUB_REF}
           REF=${REF#refs/heads/}
           echo REF: $REF
-          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          BOOST_BRANCH=develop && ( test "${GITHUB_REF_NAME}" == "master" || test "${GITHUB_REF_NAME}" == "modular" ) && BOOST_BRANCH=${GITHUB_REF_NAME} || true
+          BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boostdep/boost}.git
+          echo BOOST_GIT: ${BOOST_GIT}
           echo BOOST_BRANCH: $BOOST_BRANCH
           cd ..
-          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          git clone -b "${BOOST_BRANCH}" --depth 1 "${BOOST_GIT}" boost-root
           cd boost-root
           git submodule update --init tools/build
           cp -r $GITHUB_WORKSPACE/* tools/boostdep
@@ -320,10 +328,12 @@ jobs:
           REF=${GITHUB_BASE_REF:-$GITHUB_REF}
           REF=${REF#refs/heads/}
           echo REF: $REF
-          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          BOOST_BRANCH=develop && ( test "${GITHUB_REF_NAME}" == "master" || test "${GITHUB_REF_NAME}" == "modular" ) && BOOST_BRANCH=${GITHUB_REF_NAME} || true
+          BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boostdep/boost}.git
+          echo BOOST_GIT: ${BOOST_GIT}
           echo BOOST_BRANCH: $BOOST_BRANCH
           cd ..
-          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          git clone -b "${BOOST_BRANCH}" --depth 1 "${BOOST_GIT}" boost-root
           cd boost-root
           git submodule update --init
           rm -rf tools/boostdep/*
