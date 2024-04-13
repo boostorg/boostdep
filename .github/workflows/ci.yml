@@ -295,7 +295,7 @@ jobs:
         run: |
           cd ../boost-root
           python3 tools/boostdep/depinst/depinst.py --git_args "--jobs 3" ../tools/boostdep
-          ./b2 -j3 tools/boostdep/build
+          ./b2 -j3 tools/boostdep//dist
 
   posix-cmake:
 
@@ -339,7 +339,7 @@ jobs:
           rm -rf tools/boostdep/*
           cp -r $GITHUB_WORKSPACE/* tools/boostdep
           ./bootstrap.sh
-          ./b2 tools/boostdep/build link=static
+          ./b2 tools/boostdep//dist link=static
 
       - name: Check exceptions
         run: |
