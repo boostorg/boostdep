@@ -14,14 +14,15 @@ DIST_DIR = [ path.root [ path.make $(DIST_DIR) ] [ path.pwd ] ] ;
 
 project /boost/boostdep ;
 
-explicit
-    [ install dist-bin
-        : build//boostdep/<link>static
-        : <install-type>EXE <location>$(DIST_DIR)/bin
-        : release ]
-    [ alias boostdep : build//boostdep ]
-    [ alias all : boostdep test dist-bin ]
-    ;
+install dist-bin
+    : build//boostdep/<link>static
+    : <install-type>EXE <location>$(DIST_DIR)/bin
+    : release ;
+explicit install ;
+alias boostdep : build//boostdep ;
+explicit boostdep ;
+alias all : boostdep test dist-bin ;
+explicit all ;
 
 # Install distribution files/execs by default.
 alias dist : dist-bin ;
