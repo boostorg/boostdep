@@ -179,11 +179,11 @@ jobs:
         run: |
           echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
           echo GITHUB_BASE_REF: $GITHUB_BASE_REF
-          echo GITHUB_REF: $GITHUB_REF
-          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
-          REF=${REF#refs/heads/}
-          echo REF: $REF
-          BOOST_BRANCH=develop && ( test "${GITHUB_REF_NAME}" == "master" || test "${GITHUB_REF_NAME}" == "modular" ) && BOOST_BRANCH=${GITHUB_REF_NAME} || true
+          echo GITHUB_REF_NAME: $GITHUB_REF_NAME
+          BOOST_BRANCH=develop
+          [[ -n "${GITHUB_REF_NAME}" ]] && BOOST_BRANCH=${GITHUB_REF_NAME}
+          [[ "${GITHUB_REF_NAME}" =~ ^"feature/" ]] && BOOST_BRANCH=develop
+          [[ -n "${GITHUB_BASE_REF}" ]] && BOOST_BRANCH=${GITHUB_BASE_REF}
           BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boostdep/boost}.git
           echo BOOST_GIT: ${BOOST_GIT}
           echo BOOST_BRANCH: $BOOST_BRANCH
@@ -241,12 +241,12 @@ jobs:
         shell: cmd
         run: |
           echo GITHUB_REPOSITORY: %GITHUB_REPOSITORY%
+          echo GITHUB_REF_NAME: %GITHUB_REF_NAME%
           echo GITHUB_BASE_REF: %GITHUB_BASE_REF%
-          echo GITHUB_REF: %GITHUB_REF%
-          if "%GITHUB_BASE_REF%" == "" set GITHUB_BASE_REF=%GITHUB_REF%
           set BOOST_BRANCH=develop
-          for /f %%i in ("%GITHUB_BASE_REF%") do if "%%~nxi" == "master" set BOOST_BRANCH=master
-          for /f %%i in ("%GITHUB_BASE_REF%") do if "%%~nxi" == "modular" set BOOST_BRANCH=modular
+          if [%GITHUB_REF_NAME%] NEQ [] set BOOST_BRANCH=%GITHUB_REF_NAME%
+          if [%GITHUB_REF_NAME:~0,8%] EQU [feature/] set BOOST_BRANCH=develop
+          if [%GITHUB_BASE_REF%] NEQ [] set BOOST_BRANCH=%GITHUB_BASE_REF%
           set BOOST_GIT=https://github.com/%GITHUB_REPOSITORY:boostdep=boost%.git
           echo BOOST_GIT: %BOOST_GIT%
           echo BOOST_BRANCH: %BOOST_BRANCH%
@@ -276,11 +276,11 @@ jobs:
         run: |
           echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
           echo GITHUB_BASE_REF: $GITHUB_BASE_REF
-          echo GITHUB_REF: $GITHUB_REF
-          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
-          REF=${REF#refs/heads/}
-          echo REF: $REF
-          BOOST_BRANCH=develop && ( test "${GITHUB_REF_NAME}" == "master" || test "${GITHUB_REF_NAME}" == "modular" ) && BOOST_BRANCH=${GITHUB_REF_NAME} || true
+          echo GITHUB_REF_NAME: $GITHUB_REF_NAME
+          BOOST_BRANCH=develop
+          [[ -n "${GITHUB_REF_NAME}" ]] && BOOST_BRANCH=${GITHUB_REF_NAME}
+          [[ "${GITHUB_REF_NAME}" =~ ^"feature/" ]] && BOOST_BRANCH=develop
+          [[ -n "${GITHUB_BASE_REF}" ]] && BOOST_BRANCH=${GITHUB_BASE_REF}
           BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boostdep/boost}.git
           echo BOOST_GIT: ${BOOST_GIT}
           echo BOOST_BRANCH: $BOOST_BRANCH
@@ -324,11 +324,11 @@ jobs:
         run: |
           echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
           echo GITHUB_BASE_REF: $GITHUB_BASE_REF
-          echo GITHUB_REF: $GITHUB_REF
-          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
-          REF=${REF#refs/heads/}
-          echo REF: $REF
-          BOOST_BRANCH=develop && ( test "${GITHUB_REF_NAME}" == "master" || test "${GITHUB_REF_NAME}" == "modular" ) && BOOST_BRANCH=${GITHUB_REF_NAME} || true
+          echo GITHUB_REF_NAME: $GITHUB_REF_NAME
+          BOOST_BRANCH=develop
+          [[ -n "${GITHUB_REF_NAME}" ]] && BOOST_BRANCH=${GITHUB_REF_NAME}
+          [[ "${GITHUB_REF_NAME}" =~ ^"feature/" ]] && BOOST_BRANCH=develop
+          [[ -n "${GITHUB_BASE_REF}" ]] && BOOST_BRANCH=${GITHUB_BASE_REF}
           BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boostdep/boost}.git
           echo BOOST_GIT: ${BOOST_GIT}
           echo BOOST_BRANCH: $BOOST_BRANCH
