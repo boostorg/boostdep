@@ -2734,6 +2734,10 @@ static void output_module_cmake_report( std::string module )
             "add_library(Boost::" << lm << " ALIAS boost_" << lm << ")\n"
             "\n"
             "target_include_directories(boost_" << lm << " INTERFACE include)\n"
+            "if(NOT CMAKE_VERSION VERSION_LESS \"3.19\")\n"
+            "  file(GLOB_RECURSE headers include/*.hpp)\n"
+            "  target_sources(boost_optional PRIVATE ${headers})\n"
+            "endif()\n"
             "\n"
         ;
 
@@ -2772,6 +2776,9 @@ static void output_module_cmake_report( std::string module )
 
         std::cout <<
 
+            "file(GLOB_RECURSE headers include/*.hpp)\n";
+        std::cout <<
+
             "add_library(boost_" << lm << "\n";
 
         for( std::vector<std::string>::iterator i = sources.begin(); i != sources.end(); ++i )
@@ -2781,6 +2788,7 @@ static void output_module_cmake_report( std::string module )
 
         std::cout <<
 
+            "  ${headers}\n"
             ")\n"
             "\n"
             "add_library(Boost::" << lm << " ALIAS boost_" << lm << ")\n"
