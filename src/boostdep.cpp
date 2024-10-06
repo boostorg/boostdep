@@ -3361,7 +3361,8 @@ public:
 
 int main( int argc, char const* argv[] )
 {
-    if( argc < 2 )
+    const std::string first_option = argc < 2 ? "" : argv[1];
+    if( first_option.empty() || first_option == "-h" || first_option == "--help" )
     {
         std::cout <<
 
