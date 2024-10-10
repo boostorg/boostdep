@@ -7,7 +7,6 @@ on:
       - master
       - develop
       - feature/**
-      - modular
 
 env:
   UBSAN_OPTIONS: print_stacktrace=1
@@ -194,16 +193,14 @@ jobs:
         run: |
           echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
           echo GITHUB_BASE_REF: $GITHUB_BASE_REF
-          echo GITHUB_REF_NAME: $GITHUB_REF_NAME
-          BOOST_BRANCH=develop
-          [[ -n "${GITHUB_REF_NAME}" ]] && BOOST_BRANCH=${GITHUB_REF_NAME}
-          [[ "${GITHUB_REF_NAME}" =~ ^"feature/" ]] && BOOST_BRANCH=develop
-          [[ -n "${GITHUB_BASE_REF}" ]] && BOOST_BRANCH=${GITHUB_BASE_REF}
-          BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boostdep/boost}.git
-          echo BOOST_GIT: ${BOOST_GIT}
+          echo GITHUB_REF: $GITHUB_REF
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          REF=${REF#refs/heads/}
+          echo REF: $REF
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
           echo BOOST_BRANCH: $BOOST_BRANCH
           cd ..
-          git clone -b "${BOOST_BRANCH}" --depth 1 "${BOOST_GIT}" boost-root
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
           git submodule update --init libs/assert libs/bind
           cp -r $GITHUB_WORKSPACE/* tools/boostdep
@@ -256,17 +253,14 @@ jobs:
         shell: cmd
         run: |
           echo GITHUB_REPOSITORY: %GITHUB_REPOSITORY%
-          echo GITHUB_REF_NAME: %GITHUB_REF_NAME%
           echo GITHUB_BASE_REF: %GITHUB_BASE_REF%
+          echo GITHUB_REF: %GITHUB_REF%
+          if "%GITHUB_BASE_REF%" == "" set GITHUB_BASE_REF=%GITHUB_REF%
           set BOOST_BRANCH=develop
-          if [%GITHUB_REF_NAME%] NEQ [] set BOOST_BRANCH=%GITHUB_REF_NAME%
-          if [%GITHUB_REF_NAME:~0,8%] EQU [feature/] set BOOST_BRANCH=develop
-          if [%GITHUB_BASE_REF%] NEQ [] set BOOST_BRANCH=%GITHUB_BASE_REF%
-          set BOOST_GIT=https://github.com/%GITHUB_REPOSITORY:boostdep=boost%.git
-          echo BOOST_GIT: %BOOST_GIT%
+          for /f %%i in ("%GITHUB_BASE_REF%") do if "%%~nxi" == "master" set BOOST_BRANCH=master
           echo BOOST_BRANCH: %BOOST_BRANCH%
           cd ..
-          git clone -b %BOOST_BRANCH% --depth 1 %BOOST_GIT% boost-root
+          git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
           git submodule update --init libs/assert libs/bind
           xcopy /s /e /q %GITHUB_WORKSPACE% tools\boostdep\
@@ -291,16 +285,14 @@ jobs:
         run: |
           echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
           echo GITHUB_BASE_REF: $GITHUB_BASE_REF
-          echo GITHUB_REF_NAME: $GITHUB_REF_NAME
-          BOOST_BRANCH=develop
-          [[ -n "${GITHUB_REF_NAME}" ]] && BOOST_BRANCH=${GITHUB_REF_NAME}
-          [[ "${GITHUB_REF_NAME}" =~ ^"feature/" ]] && BOOST_BRANCH=develop
-          [[ -n "${GITHUB_BASE_REF}" ]] && BOOST_BRANCH=${GITHUB_BASE_REF}
-          BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boostdep/boost}.git
-          echo BOOST_GIT: ${BOOST_GIT}
+          echo GITHUB_REF: $GITHUB_REF
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          REF=${REF#refs/heads/}
+          echo REF: $REF
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
           echo BOOST_BRANCH: $BOOST_BRANCH
           cd ..
-          git clone -b "${BOOST_BRANCH}" --depth 1 "${BOOST_GIT}" boost-root
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
           git submodule update --init tools/build
           cp -r $GITHUB_WORKSPACE/* tools/boostdep
@@ -310,7 +302,7 @@ jobs:
         run: |
           cd ../boost-root
           python3 tools/boostdep/depinst/depinst.py --git_args "--jobs 3" ../tools/boostdep
-          ./b2 -j3 tools/boostdep//dist
+          ./b2 -j3 tools/boostdep/build
 
   posix-cmake:
 
@@ -339,22 +331,20 @@ jobs:
         run: |
           echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
           echo GITHUB_BASE_REF: $GITHUB_BASE_REF
-          echo GITHUB_REF_NAME: $GITHUB_REF_NAME
-          BOOST_BRANCH=develop
-          [[ -n "${GITHUB_REF_NAME}" ]] && BOOST_BRANCH=${GITHUB_REF_NAME}
-          [[ "${GITHUB_REF_NAME}" =~ ^"feature/" ]] && BOOST_BRANCH=develop
-          [[ -n "${GITHUB_BASE_REF}" ]] && BOOST_BRANCH=${GITHUB_BASE_REF}
-          BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boostdep/boost}.git
-          echo BOOST_GIT: ${BOOST_GIT}
+          echo GITHUB_REF: $GITHUB_REF
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          REF=${REF#refs/heads/}
+          echo REF: $REF
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
           echo BOOST_BRANCH: $BOOST_BRANCH
           cd ..
-          git clone -b "${BOOST_BRANCH}" --depth 1 "${BOOST_GIT}" boost-root
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
           git submodule update --init
           rm -rf tools/boostdep/*
           cp -r $GITHUB_WORKSPACE/* tools/boostdep
           ./bootstrap.sh
-          ./b2 tools/boostdep//dist
+          ./b2 tools/boostdep/build
 
       - name: Check exceptions
         run: |
