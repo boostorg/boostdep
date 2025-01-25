@@ -153,6 +153,7 @@ jobs:
             container: ubuntu:24.04
             os: ubuntu-latest
             install: clang-18
+            lint: yes
           - toolset: clang
             compiler: clang++-19
             cxxstd: "11,14,17,20,2b"
@@ -196,6 +197,17 @@ jobs:
           ldd /__e/node20/bin/node
 
       - uses: actions/checkout@v4
+
+      - name: Install lint pre-reqs
+        if: ${{ matrix.lint == 'yes' }}
+        run: |
+          set -xe
+          apt-get install -y black
+      - name: Python formatter
+        if: ${{ matrix.lint == 'yes' }}
+        run: |
+          set -xe
+          black depinst/depinst.py 
 
       - name: Install packages
         if: matrix.install
