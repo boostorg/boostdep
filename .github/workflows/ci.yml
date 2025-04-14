@@ -358,7 +358,7 @@ jobs:
           rm -rf tools/boostdep/*
           cp -r $GITHUB_WORKSPACE/* tools/boostdep
           ./bootstrap.sh
-          ./b2 tools/boostdep/build
+          ./b2 tools/boostdep//dist
 
       - name: Check exceptions
         run: |
