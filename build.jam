@@ -14,15 +14,14 @@ DIST_DIR ?= [ path.join $(BOOST_ROOT) dist ] ;
 DIST_DIR ?= dist ;
 DIST_DIR = [ path.root [ path.make $(DIST_DIR) ] [ path.pwd ] ] ;
 
-project /boost/boostdep ;
+project /boost/boostdep : default-build release ;
 
-install dist-bin
-    : build//boostdep/<link>static
-    : <install-type>EXE <location>$(DIST_DIR)/bin
-    : release ;
-explicit install ;
+install dist-bin : build//boostdep/<link>static : <install-type>EXE <location>$(DIST_DIR)/bin ;
+explicit dist-bin ;
+
 alias boostdep : build//boostdep ;
 explicit boostdep ;
+
 alias all : boostdep test dist-bin ;
 explicit all ;
 
