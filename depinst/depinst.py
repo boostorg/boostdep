@@ -70,7 +70,7 @@ def module_for_header( h, x, gm ):
         return None
 
 
-def scan_header_dependencies( f, x, gm, deps, dep_path ):
+def scan_header_dependencies( f, x, gm, deps ):
 
     for line in f:
 
@@ -89,11 +89,8 @@ def scan_header_dependencies( f, x, gm, deps, dep_path ):
                     vprint( 1, 'Adding dependency', mod )
                     deps[ mod ] = 0
 
-                elif len(dep_path) > 1 and mod == dep_path[0]:
-                    raise DependencyCycle('Dependency cycle detected: ' + '->'.join(dep_path) + '->' + mod)
 
-
-def scan_directory( d, x, gm, deps, dep_path ):
+def scan_directory( d, x, gm, deps ):
 
     vprint( 1, 'Scanning directory', d )
 
@@ -111,20 +108,20 @@ def scan_directory( d, x, gm, deps, dep_path ):
             if sys.version_info[0] < 3:
 
                 with open( fn, 'r' ) as f:
-                    scan_header_dependencies( f, x, gm, deps, dep_path )
+                    scan_header_dependencies( f, x, gm, deps )
 
             else:
 
                 with open( fn, 'r', encoding='latin-1' ) as f:
-                    scan_header_dependencies( f, x, gm, deps, dep_path )
+                    scan_header_dependencies( f, x, gm, deps )
 
 
-def scan_module_dependencies( m, x, gm, deps, dirs, dep_path ):
+def scan_module_dependencies( m, x, gm, deps, dirs ):
 
     vprint( 1, 'Scanning module', m )
 
     for dir in dirs:
-        scan_directory( os.path.join( 'libs', m, dir ), x, gm, deps, dep_path )
+        scan_directory( os.path.join( 'libs', m, dir ), x, gm, deps )
 
 
 def read_exceptions():
@@ -200,7 +197,7 @@ def install_modules( modules, git_args ):
         raise Exception( "The command '%s' failed with exit code %d" % (command, r) )
 
 
-def install_module_dependencies( deps, x, gm, git_args, dep_path ):
+def install_module_dependencies( deps, x, gm, git_args ):
 
     modules = []
 
@@ -217,16 +214,9 @@ def install_module_dependencies( deps, x, gm, git_args, dep_path ):
     install_modules( modules, git_args )
 
     for m in modules:
-        next_dep_path = dep_path[:]
-        if dep_path:
-            next_dep_path.append(m)
-        scan_module_dependencies( m, x, gm, deps, [ 'include', 'src' ], next_dep_path )
+        scan_module_dependencies( m, x, gm, deps, [ 'include', 'src' ] )
 
     return len( modules )
-
-
-class DependencyCycle(Exception):
-    pass
 
 
 if( __name__ == "__main__" ):
@@ -240,7 +230,6 @@ if( __name__ == "__main__" ):
     parser.add_argument( '-I', '--include', help="additional subdirectory to scan; can be repeated", metavar='DIR', action='append', default=[] )
     parser.add_argument( '-g', '--git_args', help="additional arguments to `git submodule update`", default='', action='store' )
     parser.add_argument( '-u', '--update', help='update <library> before scanning', action='store_true' )
-    parser.add_argument( '-C', '--reject-cycles', help='abort if <library> has cyclical dependencies', action='store_true' )
     parser.add_argument( 'library', help="name of library to scan ('libs/' will be prepended)" )
 
     args = parser.parse_args()
@@ -250,7 +239,6 @@ if( __name__ == "__main__" ):
     vprint( 2, '-X:', args.exclude )
     vprint( 2, '-I:', args.include )
     vprint( 2, '-N:', args.ignore )
-    vprint( 2, '-C:', args.reject_cycles )
 
     x = read_exceptions()
     vprint( 2, 'Exceptions:', x )
@@ -281,11 +269,7 @@ if( __name__ == "__main__" ):
 
     vprint( 1, 'Directories to scan:', *dirs )
 
-    dep_path = []
-    if args.reject_cycles:
-        dep_path.append(m)
-
-    scan_module_dependencies( m, x, gm, deps, dirs, dep_path )
+    scan_module_dependencies( m, x, gm, deps, dirs )
 
     for dep in args.ignore:
         if dep in deps:
@@ -294,5 +278,5 @@ if( __name__ == "__main__" ):
 
     vprint( 2, 'Dependencies:', deps )
 
-    while install_module_dependencies( deps, x, gm, args.git_args, dep_path ):
+    while install_module_dependencies( deps, x, gm, args.git_args ):
         pass
