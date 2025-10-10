@@ -24,6 +24,14 @@ def vprint( level, *args ):
         print( *args )
 
 
+class CommandExecutionError(Exception):
+    pass
+
+
+class DependencyCycleError(Exception):
+    pass
+
+
 def is_module( m, gm ):
 
     return ( 'libs/' + m ) in gm
@@ -91,8 +99,7 @@ def scan_header_dependencies( f, x, gm, deps, dep_path ):
 
                 elif len(dep_path) > 1 and mod == dep_path[0]:
 
-                    dep_path = dep_path + [ mod ]
-                    raise DependencyCycle( 'Dependency cycle detected: ' + ' -> '.join(dep_path) )
+                    raise DependencyCycleError( 'Dependency cycle detected: ' + ' -> '.join( dep_path + [mod] ) )
 
 
 def scan_directory( d, x, gm, deps, dep_path ):
@@ -199,7 +206,7 @@ def install_modules( modules, git_args ):
     r = os.system( command );
 
     if r != 0:
-        raise Exception( "The command '%s' failed with exit code %d" % (command, r) )
+        raise CommandExecutionError( "The command '%s' failed with exit code %d" % (command, r) )
 
 
 def install_module_dependencies( deps, x, gm, git_args, dep_path ):
@@ -227,10 +234,6 @@ def install_module_dependencies( deps, x, gm, git_args, dep_path ):
         scan_module_dependencies( m, x, gm, deps, [ 'include', 'src' ], next_dep_path )
 
     return len( modules )
-
-
-class DependencyCycle(Exception):
-    pass
 
 
 if( __name__ == "__main__" ):
@@ -324,6 +327,9 @@ if( __name__ == "__main__" ):
         while install_module_dependencies( extra_deps, x, gm, args.git_args, [] ):
             pass
 
-    except DependencyCycle as e:
-        print( e, file=sys.stderr )
+    except Exception as e:
+
+        sys.stdout.flush()
+
+        print( 'Error:', e, file=sys.stderr )
         sys.exit(1)
