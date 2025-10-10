@@ -391,7 +391,7 @@ jobs:
           - throw_exception
           - uuid
 
-        args: [ '' ]
+        args: [ '', '-C' ]
 
     runs-on: ubuntu-latest
 
