@@ -21,7 +21,7 @@ verbose = 0
 def vprint( level, *args ):
 
     if verbose >= level:
-        print( *args )
+        print( *args, file=sys.stderr )
 
 
 class CommandExecutionError(Exception):
@@ -329,7 +329,5 @@ if( __name__ == "__main__" ):
 
     except Exception as e:
 
-        sys.stdout.flush()
-
-        print( 'Error:', e, file=sys.stderr )
-        sys.exit(1)
+        vprint( -1, 'Error:', e )
+        sys.exit( 1 )
