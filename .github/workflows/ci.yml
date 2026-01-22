@@ -392,7 +392,6 @@ jobs:
           - geometry
           - mp11
           - serialization
-          - static_assert
           - thread
           - throw_exception
           - uuid
