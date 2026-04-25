@@ -306,7 +306,7 @@ jobs:
           python3 tools/boostdep/depinst/depinst.py --git_args "--jobs 3" ../tools/boostdep
           ./b2 -j3 tools/boostdep/build
 
-  posix-cmake:
+  posix-cmake-build:
 
     runs-on: ubuntu-latest
 
@@ -318,11 +318,10 @@ jobs:
 
       - name: Build Boostdep with CMake
         run: |
-          mkdir __build__ && cd __build__
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/.local ..
-          cmake --build . --target install
+          cmake -S . -B __build__ -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/.local
+          cmake --build __build__ --target install
 
-  windows-cmake:
+  windows-cmake-build:
 
     runs-on: windows-latest
 
@@ -349,7 +348,7 @@ jobs:
 
       - name: Build Boostdep with CMake
         run: |
-          cmake -S . -B __build__ -DBoost_ROOT=C:/Boost -DCMAKE_INSTALL_PREFIX=C:/boostdep
+          cmake -S . -B __build__ -DBoost_ROOT=C:/Boost -DCMAKE_INSTALL_PREFIX=C:/usr/local
           cmake --build __build__ --target install --config Release
 
   posix-check-exceptions:
