@@ -1,5 +1,5 @@
 # Copyright 2018 Mike Dev
-# Copyright 2018 Peter Dimov
+# Copyright 2018, 2026 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
@@ -10,6 +10,6 @@ project(boostdep LANGUAGES CXX)
 add_executable(boostdep src/boostdep.cpp)
 
 find_package(Boost COMPONENTS filesystem REQUIRED)
-target_link_libraries(boostdep Boost::filesystem)
+target_link_libraries(boostdep PRIVATE Boost::filesystem)
 
 install(TARGETS boostdep)
