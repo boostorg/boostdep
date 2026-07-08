@@ -426,8 +426,10 @@ jobs:
           git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
           cp -r $GITHUB_WORKSPACE/* tools/boostdep
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/${{matrix.library}}.git libs/${{matrix.library}}
+          rm -rf libs/${{matrix.library}}/.git
 
       - name: Use depinst
         run: |
           cd ../boost-root
-          python tools/boostdep/depinst/depinst.py --git_args "--jobs 3" -u ${{matrix.args}} ${{matrix.library}}
+          python tools/boostdep/depinst/depinst.py --git_args "--jobs 3" ${{matrix.args}} ${{matrix.library}}
